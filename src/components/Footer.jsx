@@ -48,7 +48,7 @@ const Footer = () => {
                     textDecoration: 'none',
                     '&:hover': {
                       opacity: 1,
-                      color: '#76b900'
+                      color: '#4169E1'
                     }
                   }}
                 >
@@ -74,7 +74,7 @@ const Footer = () => {
                     textDecoration: 'none',
                     '&:hover': {
                       opacity: 1,
-                      color: '#76b900'
+                      color: '#4169E1'
                     }
                   }}
                 >
@@ -102,7 +102,7 @@ const Footer = () => {
                   sx={{
                     color: 'white',
                     '&:hover': {
-                      color: '#76b900'
+                      color: '#4169E1'
                     }
                   }}
                 >
@@ -113,7 +113,6 @@ const Footer = () => {
           </Grid>
         </Grid>
 
-        {/* Copyright */}
         <Typography 
           variant="body2" 
           sx={{ 
@@ -124,7 +123,7 @@ const Footer = () => {
             borderTop: '1px solid rgba(255, 255, 255, 0.1)'
           }}
         >
-          © {new Date().getFullYear()} GG Store. Todos los derechos reservados.
+          © 2025 GG Store. Todos los derechos reservados.
         </Typography>
       </Container>
     </Box>
