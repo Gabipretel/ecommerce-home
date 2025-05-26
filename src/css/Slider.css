@@ -1,0 +1,94 @@
+.slider-container {
+  width: 80%;
+  height: 500px;
+  margin: 0 auto;
+  padding-top: 80px;
+}
+
+.mySwiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  object-position: center;
+}
+
+.slide-content {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Estilos para los botones de navegación */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #000;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 30px;
+  border-radius: 50%;
+}
+
+/* Estilos para los puntos de paginación */
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background-color: #000;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1;
+}
+
+@media screen and (max-width: 1024px) {
+  .slider-container {
+    height: 350px;
+  }
+  
+  .swiper-button-next,
+  .swiper-button-prev {
+    padding: 25px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .slider-container {
+    height: 300px;
+  }
+  
+  .swiper-button-next,
+  .swiper-button-prev {
+    padding: 20px;
+  }
+  
+  .slide-content {
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .slider-container {
+    height: 250px;
+  }
+  
+  .swiper-button-next,
+  .swiper-button-prev {
+    padding: 15px;
+  }
+  
+  .slide-content {
+    font-size: 16px;
+  }
+} 
