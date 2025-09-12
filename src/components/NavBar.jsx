@@ -25,7 +25,7 @@ function NavBar() {
     "Sobre Nosotros",
     "Contacto",
   ];
-  const settings = ["Cuenta", "Mis pedidos", "Favoritos", "Cerrar sesión"];
+  const settings = ["Cuenta", "Mis pedidos", "Favoritos", "Panel Admin", "Cerrar sesión"];
   const [openMenu, setOpenMenu] = useState(null);
   const [openMenuUser, setOpenMenuUser] = useState(null);
 
@@ -152,9 +152,17 @@ function NavBar() {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
+                  {setting === "Panel Admin" ? (
+                    <Link to="/admin" style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {setting}
+                      </Typography>
+                    </Link>
+                  ) : (
+                    <Typography sx={{ textAlign: "center" }}>
+                      {setting}
+                    </Typography>
+                  )}
                 </MenuItem>
               ))}
             </Menu>
