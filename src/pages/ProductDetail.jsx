@@ -176,7 +176,7 @@ const ProductDetail = () => {
       <div className="bg-slate-800/30 border-b border-slate-700">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center space-x-2 text-sm">
-            <Button variant="ghost" size="sm" className="text-slate-400 hover:text-purple-400 p-0" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="sm" className="text-slate-400 hover:text-purple-400 p-0" onClick={() => navigate('/catalogo')}>
               <ArrowLeft className="w-4 h-4 mr-1" />
               Volver al catálogo
             </Button>

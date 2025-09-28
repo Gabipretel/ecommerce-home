@@ -7,6 +7,7 @@ import { Card, CardContent } from "./ui/card"
 import { Badge } from "./ui/badge"
 import { Checkbox } from "./ui/Checkbox"
 import Slider from "./Slider"
+import LoadingOverlay from "./ui/LoadingOverlay"
 import {
   Gamepad2,
   Zap,
@@ -53,6 +54,9 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
     const loadData = async () => {
       try {
         setLoading(true)
+        
+        // Simular tiempo de carga para visualizar el loader
+        await new Promise(resolve => setTimeout(resolve, 2000))
         
         // Cargar productos
         let productsResponse
@@ -181,14 +185,7 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Cargando productos...</p>
-        </div>
-      </div>
-    )
+    return <LoadingOverlay isLoading={true} message="Cargando productos..." />
   }
 
   if (error) {
@@ -477,9 +474,51 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
 
           {/* Main Content */}
           <div className="lg:w-3/4">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <div>
+            {/* Header Section */}
+            <div className="mb-6">
+              {/* Breadcrumbs and View Toggle */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2 text-sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/')}
+                    className="text-slate-400 hover:text-purple-400 p-0"
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" />
+                    Volver al inicio
+                  </Button>
+                  {categoryName && (
+                    <>
+                      <span className="text-slate-500">/</span>
+                      <span className="text-purple-400">{categoryName}</span>
+                    </>
+                  )}
+                </div>
+                
+                {/* View Toggle */}
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className={viewMode === "grid" ? "bg-purple-600" : "border-slate-600 text-slate-300"}
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className={viewMode === "list" ? "bg-purple-600" : "border-slate-600 text-slate-300"}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Results Info */}
+              <div className="mb-4">
                 <h1 className="text-2xl font-bold text-white mb-2">
                   {searchTerm
                     ? `Resultados para "${searchTerm}"`
@@ -494,50 +533,9 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                   )}
                 </p>
               </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className={viewMode === "grid" ? "bg-purple-600" : "border-slate-600 text-slate-300"}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className={viewMode === "list" ? "bg-purple-600" : "border-slate-600 text-slate-300"}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
 
-            {/* Breadcrumbs */}
-            <div className="mb-6">
-              <div className="flex items-center space-x-2 text-sm">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/')}
-                  className="text-slate-400 hover:text-purple-400 p-0"
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Volver al inicio
-                </Button>
-                {categoryName && (
-                  <>
-                    <span className="text-slate-500">/</span>
-                    <span className="text-purple-400">{categoryName}</span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Active Filters */}
-            {(activeFilters.categories.length > 0 || activeFilters.brands.length > 0 || searchTerm) && (
-              <div className="mb-6">
+              {/* Active Filters */}
+              {(activeFilters.categories.length > 0 || activeFilters.brands.length > 0 || searchTerm) && (
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="text-slate-400">Filtros activos:</span>
 
@@ -595,8 +593,8 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                     </Button>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* No Results Message */}
             {filteredProducts.length === 0 && (
@@ -622,7 +620,7 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
             {/* Products Grid */}
             {filteredProducts.length > 0 && (
               <div
-                className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" : "space-y-4"}
+                className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}
               >
                 {currentProducts.map((product) => {
                   const stockStatus = getStockStatus(product.stock || 0)
@@ -633,33 +631,33 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                   return (
                     <Card
                       key={product.id}
-                      className={`bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-all duration-300 group cursor-pointer ${
-                        viewMode === "list" ? "flex flex-row" : ""
+                      className={`product-card bg-slate-800/50 border-slate-700 hover:border-purple-500/50 group cursor-pointer ${
+                        viewMode === "list" ? "flex flex-row" : "flex flex-col"
                       }`}
                       onClick={() => navigate(`/productos/${product.id}`)}
                     >
-                      <CardContent className={`p-4 ${viewMode === "list" ? "flex w-full" : ""}`}>
-                        <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0 mr-6" : "mb-4"}`}>
+                      <CardContent className={`p-4 ${viewMode === "list" ? "flex w-full" : "flex flex-col h-full"}`}>
+                        <div className={`product-image relative ${viewMode === "list" ? "w-48 flex-shrink-0 mr-6" : "mb-4"}`}>
                           <img
                             src={product.imagen_url || "/placeholder.svg"}
                             alt={product.nombre}
-                            className={`object-cover rounded-lg ${viewMode === "list" ? "w-full h-32" : "w-full h-48"}`}
+                            className={`object-cover rounded-lg ${viewMode === "list" ? "w-full h-46 mt-2" : "w-full h-48"}`}
                           />
-                          {discount > 0 && (
+                          {/* {discount > 0 && (
                             <Badge className="absolute top-2 right-2 bg-red-600 text-white">-{discount}%</Badge>
-                          )}
-                          <div className="absolute top-2 left-2 flex space-x-1">
+                          )} */}
+                          {/* <div className="absolute top-2 left-2 flex space-x-1">
                             <Button size="sm" variant="ghost" className="w-8 h-8 p-0 bg-black/50 hover:bg-black/70">
                               <Heart className="w-4 h-4 text-white" />
                             </Button>
                             <Button size="sm" variant="ghost" className="w-8 h-8 p-0 bg-black/50 hover:bg-black/70">
                               <Eye className="w-4 h-4 text-white" />
                             </Button>
-                          </div>
+                          </div> */}
                         </div>
 
-                        <div className={`space-y-2 ${viewMode === "list" ? "flex-1" : ""}`}>
-                          <div className="flex items-center justify-between">
+                        <div className={`space-y-3 ${viewMode === "list" ? "flex-1" : "flex-1 flex flex-col"}`}>
+                          <div className="flex items-center justify-between mt-2">
                             <Badge variant="outline" className="text-purple-400 border-purple-400">
                               {product.marca?.nombre || 'Sin marca'}
                             </Badge>
@@ -669,7 +667,7 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                             </Badge>
                           </div>
 
-                          <h3 className="text-white font-semibold group-hover:text-purple-400 transition-colors">
+                          <h3 className="text-white font-semibold group-hover:text-purple-400 transition-colors line-clamp-2">
                             {product.nombre}
                           </h3>
 
@@ -692,7 +690,7 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                             )}
                           </div>
 
-                          <div className={`flex gap-2 ${viewMode === "list" ? "mt-4" : ""}`}>
+                          <div className={`flex gap-2 mt-auto ${viewMode === "list" ? "mt-4" : ""}`}>
                             <Button
                               className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                               disabled={product.stock === 0}
