@@ -150,8 +150,6 @@ export default function AppHome() {
     setUserType(null)
     setCurrentUser(null)
     setIsMenuOpen(false)
-    // Recargar la página para actualizar el estado
-    window.location.reload()
   }
 
   const handleLogin = () => {

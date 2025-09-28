@@ -65,8 +65,7 @@ function NavBar() {
     setIsAuthenticated(false);
     setUserType(null);
     setOpenMenuUser(false);
-    // Recargar la página para actualizar el estado
-    window.location.reload();
+
   };
 
   return (
