@@ -9,6 +9,13 @@ import ProductDetail from "./pages/ProductDetail.jsx";
 import { CuponProvider } from "./context/CuponContext.jsx";
 import { SidebarProvider } from "./context/SidebarContext.jsx";
 
+// Páginas de autenticación
+import UserRegister from "./pages/UserRegister.jsx";
+import AdminRegister from "./pages/AdminRegister.jsx";
+import UserLogin from "./pages/UserLogin.jsx";
+import AdminLogin from "./pages/AdminLogin.jsx";
+
+// Páginas del panel de administración
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import UserManagement from "./pages/admin/UserManagement.jsx";
 import ProductManagement from "./pages/admin/ProductManagement.jsx";
@@ -25,6 +32,12 @@ createRoot(document.getElementById("root")).render(
             <Route path="/categorias" element={<ListCategories />} />
             <Route path="/categorias/:id" element={<CategoryDetail />} />
             <Route path="/productos/:id" element={<ProductDetail />} />
+            
+            {/* Rutas de autenticación */}
+            <Route path="/register-user" element={<UserRegister />} />
+            <Route path="/register-admin" element={<AdminRegister />} />
+            <Route path="/login-user" element={<UserLogin />} />
+            <Route path="/login-admin" element={<AdminLogin />} />
             
             {/* Rutas del panel de administración */}
             <Route path="/admin" element={<AdminDashboard />} />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -15,6 +15,7 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 import { Link } from "react-router";
+import authService from "../services/authService";
 
 function NavBar() {
   const pages = [
@@ -28,6 +29,21 @@ function NavBar() {
   const settings = ["Cuenta", "Mis pedidos", "Favoritos", "Panel Admin", "Cerrar sesión"];
   const [openMenu, setOpenMenu] = useState(null);
   const [openMenuUser, setOpenMenuUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userType, setUserType] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(authService.isAuthenticated());
+      setUserType(authService.getUserType());
+    };
+    
+    checkAuth();
+    // Verificar autenticación cada vez que se carga la página
+    window.addEventListener('storage', checkAuth);
+    
+    return () => window.removeEventListener('storage', checkAuth);
+  }, []);
 
   const handleOpenNavMenu = () => {
     setOpenMenu(true);
@@ -42,6 +58,15 @@ function NavBar() {
 
   const handleCloseUserMenu = () => {
     setOpenMenuUser(false);
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    setIsAuthenticated(false);
+    setUserType(null);
+    setOpenMenuUser(false);
+    // Recargar la página para actualizar el estado
+    window.location.reload();
   };
 
   return (
@@ -127,45 +152,83 @@ function NavBar() {
               </Button>
             ))}
           </Box>
-          {/* Icono de carrito y avatar */}
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Abrir menu">
-              <Badge badgeContent={4} color="error" sx={{ marginRight: 3 }}>
+          {/* Icono de carrito y autenticación */}
+          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title="Carrito de compras">
+              <Badge badgeContent={4} color="error" sx={{ marginRight: 1 }}>
                 <IconButton sx={{ p: 0, color: "white" }}>
                   <ShoppingCartIcon />
                 </IconButton>
               </Badge>
-
-              <IconButton onClick={handleOpenUserMenu} sx={{ mr: 2 }}>
-                <Avatar alt="avatar image" src={""} />
-              </IconButton>
             </Tooltip>
-            {/* Menu de usuario */}
-            <Menu
-              sx={{ mt: 6.6, mr: 2 }}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={openMenuUser}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  {setting === "Panel Admin" ? (
-                    <Link to="/admin" style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <Typography sx={{ textAlign: "center" }}>
-                        {setting}
-                      </Typography>
-                    </Link>
-                  ) : (
-                    <Typography sx={{ textAlign: "center" }}>
-                      {setting}
-                    </Typography>
-                  )}
-                </MenuItem>
-              ))}
-            </Menu>
+
+            {isAuthenticated ? (
+              <>
+                <Tooltip title="Abrir menu de usuario">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ mr: 1 }}>
+                    <Avatar alt="avatar image" src={""} />
+                  </IconButton>
+                </Tooltip>
+                {/* Menu de usuario autenticado */}
+                <Menu
+                  sx={{ mt: 6.6, mr: 2 }}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={openMenuUser}
+                  onClose={handleCloseUserMenu}
+                >
+                  {settings.map((setting) => (
+                    <MenuItem key={setting} onClick={setting === "Cerrar sesión" ? handleLogout : handleCloseUserMenu}>
+                      {setting === "Panel Admin" && userType === "admin" ? (
+                        <Link to="/admin" style={{ textDecoration: 'none', color: 'inherit' }}>
+                          <Typography sx={{ textAlign: "center" }}>
+                            {setting}
+                          </Typography>
+                        </Link>
+                      ) : setting === "Cerrar sesión" ? (
+                        <Typography sx={{ textAlign: "center" }}>
+                          {setting}
+                        </Typography>
+                      ) : (
+                        <Typography sx={{ textAlign: "center" }}>
+                          {setting}
+                        </Typography>
+                      )}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
+            ) : (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  component={Link}
+                  to="/login-user"
+                  variant="outlined"
+                  size="small"
+                  sx={{ 
+                    color: 'white', 
+                    borderColor: 'white',
+                    '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)' }
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  component={Link}
+                  to="/register-user"
+                  variant="contained"
+                  size="small"
+                  sx={{ 
+                    backgroundColor: '#9c27b0',
+                    '&:hover': { backgroundColor: '#7b1fa2' }
+                  }}
+                >
+                  Registro
+                </Button>
+              </Box>
+            )}
           </Box>
         </Toolbar>
       </Container>
