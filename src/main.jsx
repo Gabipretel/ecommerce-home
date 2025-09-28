@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router";
-import ListCategories from "./pages/ListCategories.jsx";
+import GeneralCatalog from "./pages/GeneralCatalog.jsx";
 import CategoryDetail from "./pages/CategoryDetail.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
 import { CuponProvider } from "./context/CuponContext.jsx";
@@ -29,7 +29,7 @@ createRoot(document.getElementById("root")).render(
           <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<App />} />
-            <Route path="/categorias" element={<ListCategories />} />
+            <Route path="/catalogo" element={<GeneralCatalog />} />
             <Route path="/categorias/:id" element={<CategoryDetail />} />
             <Route path="/productos/:id" element={<ProductDetail />} />
             

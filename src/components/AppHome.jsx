@@ -35,19 +35,35 @@ export default function AppHome() {
   const [userType, setUserType] = useState(null)
   const [currentUser, setCurrentUser] = useState(null)
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [categoriesError, setCategoriesError] = useState(null)
 
-  const categories = [
-    { name: "Procesadores", icon: Cpu, color: "from-blue-500 to-cyan-500" },
-    { name: "Placas de Video", icon: Monitor, color: "from-green-500 to-emerald-500" },
-    { name: "Memorias RAM", icon: MemoryStick, color: "from-purple-500 to-violet-500" },
-    { name: "Mothers", icon: Motherboard, color: "from-orange-500 to-red-500" },
-    { name: "Fuentes", icon: Power, color: "from-yellow-500 to-orange-500" },
-    { name: "Gabinetes", icon: Box, color: "from-pink-500 to-rose-500" },
-    { name: "Monitores", icon: Monitor, color: "from-indigo-500 to-purple-500" },
-    { name: "Notebooks", icon: Laptop, color: "from-teal-500 to-cyan-500" },
-  ]
+  // Mapeo de iconos para las categorías
+  const categoryIcons = {
+    "Procesadores": Cpu,
+    "Placas de Video": Monitor,
+    "Memorias RAM": MemoryStick,
+    "Mothers": Motherboard,
+    "Fuentes": Power,
+    "Gabinetes": Box,
+    "Monitores": Monitor,
+    "Notebooks": Laptop,
+  }
+
+  // Mapeo de colores para las categorías
+  const categoryColors = {
+    "Procesadores": "from-blue-500 to-cyan-500",
+    "Placas de Video": "from-green-500 to-emerald-500",
+    "Memorias RAM": "from-purple-500 to-violet-500",
+    "Mothers": "from-orange-500 to-red-500",
+    "Fuentes": "from-yellow-500 to-orange-500",
+    "Gabinetes": "from-pink-500 to-rose-500",
+    "Monitores": "from-indigo-500 to-purple-500",
+    "Notebooks": "from-teal-500 to-cyan-500",
+  }
 
   const brands = ["NVIDIA", "AMD", "Logitech", "Samsung", "Corsair", "Razer", "Intel", "Gamemax"]
 
@@ -71,23 +87,53 @@ export default function AppHome() {
     return () => window.removeEventListener('storage', checkAuth)
   }, [])
 
-  // Cargar productos
+  // Cargar categorías desde la API
   useEffect(() => {
-    const getAllProducts = async () => {
+    const getCategories = async () => {
+      try {
+        setCategoriesLoading(true)
+        setCategoriesError(null)
+        
+        const response = await api.get('/categorias?activo=true&orderBy=nombre&orderDirection=ASC')
+        console.log("Respuesta de categorías:", response.data)
+        
+        if (response.data.data) {
+          setCategories(response.data.data)
+        } else {
+          setCategoriesError('No se pudieron cargar las categorías')
+        }
+        
+      } catch (error) {
+        console.error("Error al cargar categorías:", error)
+        setCategoriesError(error.message)
+        setCategories([])
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+
+    getCategories()
+  }, [])
+
+  // Cargar productos destacados
+  useEffect(() => {
+    const getFeaturedProducts = async () => {
       try {
         setLoading(true)
         setError(null)
         
-        // Temporalmente deshabilitado para debugging
-        // const response = await api("http://localhost:3000/api/productos")
-        // console.log("Respuesta de productos:", response.data)
+        // Obtener los primeros 4 productos activos
+        const response = await api.get('/productos?activo=true&limit=4&orderBy=createdAt&orderDirection=DESC')
+        console.log("Respuesta de productos destacados:", response.data)
         
-        // Por ahora usar productos vacíos para forzar el uso de productos de ejemplo
-        console.log("Usando productos de ejemplo para debugging")
-        setProducts([])
+        if (response.data.data) {
+          setProducts(response.data.data)
+        } else {
+          setError('No se pudieron cargar los productos destacados')
+        }
         
       } catch (error) {
-        console.error("Error al cargar productos:", error)
+        console.error("Error al cargar productos destacados:", error)
         setError(error.message)
         setProducts([])
       } finally {
@@ -95,7 +141,7 @@ export default function AppHome() {
       }
     }
 
-    getAllProducts()
+    getFeaturedProducts()
   }, [])
 
   const handleLogout = () => {
@@ -304,9 +350,9 @@ export default function AppHome() {
               <Button
                 variant="outline"
                 className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white px-8 py-3 text-lg"
-                onClick={() => navigate('/categorias')}
+                onClick={() => navigate('/catalogo')}
               >
-                Explorar Categorías
+                Ver Catálogo Completo
               </Button>
             </div>
           </div>
@@ -317,21 +363,41 @@ export default function AppHome() {
       <section className="py-16 px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-white text-center mb-12">Explora por Categorías</h2>
+          
+          {categoriesLoading ? (
+            <div className="text-center text-white">
+              <div className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p>Cargando categorías...</p>
+            </div>
+          ) : categoriesError ? (
+            <div className="text-center text-red-400">
+              <p>Error al cargar categorías: {categoriesError}</p>
+              <p className="text-slate-300">Mostrando categorías de ejemplo</p>
+            </div>
+          ) : null}
+          
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((category, index) => {
-              const IconComponent = category.icon
+            {categories.map((category) => {
+              const IconComponent = categoryIcons[category.nombre] || Box
+              const colorClass = categoryColors[category.nombre] || "from-slate-500 to-slate-600"
+              
               return (
                 <Card
-                  key={index}
+                  key={category.id}
                   className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-all duration-300 cursor-pointer group"
+                  onClick={() => {
+                    // Navegar al catálogo de esa categoría usando el ID real de la API
+                    navigate(`/categorias/${category.id}`)
+                  }}
                 >
                   <CardContent className="p-6 text-center">
                     <div
-                      className={`w-16 h-16 mx-auto mb-4 mt-4 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-16 h-16 mx-auto mb-4 mt-4 rounded-full bg-gradient-to-r ${colorClass} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                     >
                       <IconComponent className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-white font-semibold text-sm md:text-base">{category.name}</h3>
+                    <h3 className="text-white font-semibold text-sm md:text-base">{category.nombre}</h3>
+                    <p className="text-slate-400 text-xs mt-1">{category.descripcion}</p>
                   </CardContent>
                 </Card>
               )
@@ -366,17 +432,17 @@ export default function AppHome() {
                 <CardContent className="p-4">
                   <div className="relative mb-4">
                     <img
-                      src={product.imagen || "/placeholder.svg"}
+                      src={product.imagen_url || "/placeholder.svg"}
                       alt={product.nombre}
                       className="w-full h-48 object-cover rounded-lg"
                     />
-                    {product.descuento && (
-                      <Badge className="absolute top-2 right-2 bg-red-600 text-white">-{product.descuento}%</Badge>
+                    {product.destacado && (
+                      <Badge className="absolute top-2 right-2 bg-purple-600 text-white">Destacado</Badge>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Badge variant="outline" className="text-purple-400 border-purple-400">
-                      {String(product.marca || 'Gaming')}
+                      {String(product.marca?.nombre || 'Gaming')}
                     </Badge>
                     <h3 className="text-white font-semibold text-sm group-hover:text-purple-400 transition-colors">
                       {String(product.nombre || 'Producto')}
@@ -394,8 +460,8 @@ export default function AppHome() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <span className="text-2xl font-bold text-white">${Number(product.precio || 0).toFixed(2)}</span>
-                      {product.precio_anterior && (
-                        <span className="text-slate-400 line-through">${Number(product.precio_anterior || 0).toFixed(2)}</span>
+                      {product.stock && product.stock < 5 && (
+                        <span className="text-orange-400 text-sm">¡Pocas unidades!</span>
                       )}
                     </div>
                     <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
@@ -404,96 +470,14 @@ export default function AppHome() {
                   </div>
                 </CardContent>
               </Card>
-            )) : !loading ? (
-              // Productos de ejemplo si no hay productos de la API
-              [
-                {
-                  id: 1,
-                  nombre: "NVIDIA RTX 4080 Super",
-                  marca: "NVIDIA",
-                  precio: 1299.99,
-                  precio_anterior: 1499.99,
-                  imagen: "/placeholder.svg?height=200&width=200",
-                  rating: 4.8,
-                  descuento: 13,
-                },
-                {
-                  id: 2,
-                  nombre: "Logitech G Pro X Superlight",
-                  marca: "Logitech",
-                  precio: 149.99,
-                  precio_anterior: 179.99,
-                  imagen: "/placeholder.svg?height=200&width=200",
-                  rating: 4.9,
-                  descuento: 17,
-                },
-                {
-                  id: 3,
-                  nombre: 'Samsung Odyssey G7 32"',
-                  marca: "Samsung",
-                  precio: 699.99,
-                  precio_anterior: 799.99,
-                  imagen: "/placeholder.svg?height=200&width=200",
-                  rating: 4.7,
-                  descuento: 12,
-                },
-                {
-                  id: 4,
-                  nombre: "AMD Ryzen 9 7900X",
-                  marca: "AMD",
-                  precio: 549.99,
-                  precio_anterior: 599.99,
-                  imagen: "/placeholder.svg?height=200&width=200",
-                  rating: 4.8,
-                  descuento: 8,
-                },
-              ].map((product) => (
-                <Card
-                  key={product.id}
-                  className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-all duration-300 group"
-                >
-                  <CardContent className="p-4">
-                    <div className="relative mb-4">
-                      <img
-                        src={product.imagen || "/placeholder.svg"}
-                        alt={String(product.nombre)}
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
-                      {product.descuento && (
-                        <Badge className="absolute top-2 right-2 bg-red-600 text-white">-{product.descuento}%</Badge>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Badge variant="outline" className="text-purple-400 border-purple-400">
-                        {String(product.marca)}
-                      </Badge>
-                      <h3 className="text-white font-semibold text-sm group-hover:text-purple-400 transition-colors">
-                        {String(product.nombre)}
-                      </h3>
-                      <div className="flex items-center space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${
-                              i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-slate-600"
-                            }`}
-                          />
-                        ))}
-                        <span className="text-slate-400 text-sm">({product.rating})</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl font-bold text-white">${Number(product.precio).toFixed(2)}</span>
-                        {product.precio_anterior && (
-                          <span className="text-slate-400 line-through">${Number(product.precio_anterior).toFixed(2)}</span>
-                        )}
-                      </div>
-                      <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                        Agregar al Carrito
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+            )) : !loading && products.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <div className="text-slate-400 mb-4">
+                  <ShoppingCart className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-xl font-semibold text-white mb-2">No hay productos disponibles</h3>
+                  <p className="text-slate-400">Pronto tendremos productos increíbles para ti</p>
+                </div>
+              </div>
             ) : null}
           </div>
         </div>
