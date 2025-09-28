@@ -327,7 +327,7 @@ export default function AppHome() {
                 >
                   <CardContent className="p-6 text-center">
                     <div
-                      className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-16 h-16 mx-auto mb-4 mt-4 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                     >
                       <IconComponent className="w-8 h-8 text-white" />
                     </div>
