@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import authService from "../services/authService"
 import api from "../services/api"
+import { formatPrice } from "../utils/priceFormatter"
 
 export default function AppHome() {
   const navigate = useNavigate()
@@ -457,7 +458,7 @@ export default function AppHome() {
                       <span className="text-slate-400 text-sm">(4.5)</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-white">${Number(product.precio || 0).toFixed(2)}</span>
+                      <span className="text-2xl font-bold text-white">{formatPrice(Number(product.precio || 0))}</span>
                       {product.stock && product.stock < 5 && (
                         <span className="text-orange-400 text-sm">¡Pocas unidades!</span>
                       )}

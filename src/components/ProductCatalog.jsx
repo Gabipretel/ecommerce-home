@@ -27,6 +27,7 @@ import {
   Package,
 } from "lucide-react"
 import api from "../services/api"
+import { formatPrice } from "../utils/priceFormatter"
 
 const ProductCatalog = ({ categoryId, categoryName }) => {
   const navigate = useNavigate()
@@ -684,9 +685,9 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                           </div>
 
                           <div className="flex items-center space-x-2">
-                            <span className="text-2xl font-bold text-white">${price.toFixed(2)}</span>
+                            <span className="text-2xl font-bold text-white">{formatPrice(price)}</span>
                             {discount > 0 && (
-                              <span className="text-slate-400 line-through">${originalPrice.toFixed(2)}</span>
+                              <span className="text-slate-400 line-through">{formatPrice(originalPrice)}</span>
                             )}
                           </div>
 

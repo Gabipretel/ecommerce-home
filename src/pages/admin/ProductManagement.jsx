@@ -7,6 +7,7 @@ import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import Toast from '../../components/admin/Toast';
 import useCrud from '../../hooks/useCrud';
 import useToast from '../../hooks/useToast';
+import { formatPrice } from '../../utils/priceFormatter';
 
 const ProductManagement = () => {
   const {
@@ -84,12 +85,6 @@ const ProductManagement = () => {
     }
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR'
-    }).format(price);
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES', {

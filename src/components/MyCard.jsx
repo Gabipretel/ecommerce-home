@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Rating from "@mui/material/Rating";
 import Chip from "@mui/material/Chip";
+import { formatPrice } from "../utils/priceFormatter";
 import { useCupon } from "../context/CuponContext";
 const MyCard = ({
   nombre,
@@ -109,7 +110,7 @@ const MyCard = ({
                         fontSize: "0.9rem"
                       }}
                     >
-                      ${precioNumerico.toFixed(2)}
+                      {formatPrice(precioNumerico)}
                     </Typography>
                     <Typography
                       variant="h6"
@@ -119,7 +120,7 @@ const MyCard = ({
                         fontSize: "1.1rem"
                       }}
                     >
-                      ${precioConCupon.toFixed(2)}
+                      {formatPrice(precioConCupon)}
                     </Typography>
                     <Chip
                       label={`${cuponActivo.porcentajeDescuento}% OFF con cupón`}
@@ -148,7 +149,7 @@ const MyCard = ({
                       }
                     }
                   >
-                    ${precioNumerico.toFixed(2)}
+                    {formatPrice(precioNumerico)}
                   </Typography>
                   {oferta && descuento > 0 && typeof descuento === 'number' && (
                     <>
@@ -160,7 +161,7 @@ const MyCard = ({
                           fontSize: "1.1rem"
                         }}
                       >
-                        ${(precioNumerico - (precioNumerico * descuento) / 100).toFixed(2)}
+                        {formatPrice(precioNumerico - (precioNumerico * descuento) / 100)}
                       </Typography>
                       <Chip
                         label={`${descuento}% OFF`}

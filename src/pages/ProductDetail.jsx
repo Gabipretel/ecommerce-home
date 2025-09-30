@@ -28,6 +28,7 @@ import {
 import api from "../services/api"
 import { useCupon } from "../context/CuponContext"
 import CuponInput from "../components/CuponInput"
+import { formatPrice } from "../utils/priceFormatter"
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -329,25 +330,25 @@ const ProductDetail = () => {
               <div className="flex items-center space-x-3">
                 {cuponActivo && precioConCupon ? (
                   <>
-                    <span className="text-4xl font-bold text-green-400">${precioConCupon.toFixed(2)}</span>
-                    <span className="text-2xl text-slate-400 line-through">${price.toFixed(2)}</span>
+                    <span className="text-4xl font-bold text-green-400">{formatPrice(precioConCupon)}</span>
+                    <span className="text-2xl text-slate-400 line-through">{formatPrice(price)}</span>
                   </>
                 ) : (
                   <>
-                    <span className="text-4xl font-bold text-white">${price.toFixed(2)}</span>
+                    <span className="text-4xl font-bold text-white">{formatPrice(price)}</span>
                     {discount > 0 && (
-                      <span className="text-2xl text-slate-400 line-through">${originalPrice.toFixed(2)}</span>
+                      <span className="text-2xl text-slate-400 line-through">{formatPrice(originalPrice)}</span>
                     )}
                   </>
                 )}
               </div>
               {cuponActivo && precioConCupon ? (
                 <p className="text-green-400 font-semibold">
-                  ¡Ahorras ${(price - precioConCupon).toFixed(2)} con cupón {cuponActivo.porcentajeDescuento}%!
+                  ¡Ahorras {formatPrice(price - precioConCupon)} con cupón {cuponActivo.porcentajeDescuento}%!
                 </p>
               ) : discount > 0 ? (
                 <p className="text-green-400 font-semibold">
-                  Ahorras ${(originalPrice - price).toFixed(2)} ({discount}% de descuento)
+                  Ahorras {formatPrice(originalPrice - price)} ({discount}% de descuento)
                 </p>
               ) : null}
             </div>
