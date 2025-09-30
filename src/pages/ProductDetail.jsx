@@ -93,8 +93,18 @@ const ProductDetail = () => {
   const originalPrice = discount > 0 ? price / (1 - discount / 100) : price
   const precioConCupon = calcularPrecioConCupon(price)
 
-  // Crear array de imágenes (por ahora solo una, pero preparado para múltiples)
-  const images = producto.imagen_url ? [producto.imagen_url] : ["/placeholder.svg"]
+  // Crear array de imágenes combinando imagen principal y galería
+  const images = [];
+  if (producto.imagen_url) {
+    images.push(producto.imagen_url);
+  }
+  if (producto.galeria_imagenes && Array.isArray(producto.galeria_imagenes)) {
+    images.push(...producto.galeria_imagenes);
+  }
+  // Si no hay imágenes, usar placeholder
+  if (images.length === 0) {
+    images.push("/placeholder.svg");
+  }
 
   const getStockStatus = (stock) => {
     if (stock === 0) return { text: "Sin Stock", color: "bg-red-600", textColor: "text-red-100" }
@@ -197,12 +207,24 @@ const ProductDetail = () => {
               <img
                 src={images[selectedImage] || "/placeholder.svg"}
                 alt={producto.nombre}
-                className="w-full h-96 object-cover"
+                className="w-full h-96 object-cover transition-opacity duration-300"
+                onError={(e) => {
+                  e.target.src = "/placeholder.svg";
+                }}
               />
               {discount > 0 && (
                 <Badge className="absolute top-4 right-4 bg-red-600 text-white text-lg px-3 py-1">
                   -{discount}%
                 </Badge>
+              )}
+
+              {/* Indicador de imagen actual */}
+              {images.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full">
+                  <span className="text-white text-sm">
+                    {selectedImage + 1} / {images.length}
+                  </span>
+                </div>
               )}
 
               {/* Navegación de imágenes */}
@@ -211,41 +233,56 @@ const ProductDetail = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-all duration-200 opacity-70 hover:opacity-100"
                     onClick={() => setSelectedImage(selectedImage > 0 ? selectedImage - 1 : images.length - 1)}
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-5 h-5" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-all duration-200 opacity-70 hover:opacity-100"
                     onClick={() => setSelectedImage(selectedImage < images.length - 1 ? selectedImage + 1 : 0)}
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-5 h-5" />
                   </Button>
                 </>
               )}
             </div>
 
-            {/* Miniaturas */}
+            {/* Miniaturas mejoradas */}
             {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`relative rounded-lg overflow-hidden border-2 transition-all ${
-                      selectedImage === index ? "border-purple-400" : "border-slate-600 hover:border-slate-500"
-                    }`}
-                  >
-                    <img
-                      src={image || "/placeholder.svg"}
-                      alt={`${producto.nombre} ${index + 1}`}
-                      className="w-full h-20 object-cover"
-                    />
-                  </button>
-                ))}
+              <div className="space-y-2">
+                <h4 className="text-sm text-slate-400 font-medium">
+                  Galería de imágenes ({images.length})
+                </h4>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-32 overflow-y-auto">
+                  {images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`relative rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
+                        selectedImage === index 
+                          ? "border-purple-400 shadow-lg shadow-purple-400/30" 
+                          : "border-slate-600 hover:border-slate-500"
+                      }`}
+                    >
+                      <img
+                        src={image || "/placeholder.svg"}
+                        alt={`${producto.nombre} ${index + 1}`}
+                        className="w-full h-16 object-cover"
+                        onError={(e) => {
+                          e.target.src = "/placeholder.svg";
+                        }}
+                      />
+                      {selectedImage === index && (
+                        <div className="absolute inset-0 bg-purple-500/20 flex items-center justify-center">
+                          <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>

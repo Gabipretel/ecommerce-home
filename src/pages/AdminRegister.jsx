@@ -124,7 +124,7 @@ const AdminRegister = () => {
   }
 
   return (
-    <AuthProtectedRoute>
+    <>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-slate-800/50 border border-purple-500/20 backdrop-blur-sm rounded-lg">
           <div className="p-6 text-center space-y-4">
@@ -304,7 +304,7 @@ const AdminRegister = () => {
         message={modal.message}
         onAccept={handleModalAccept}
       />
-    </AuthProtectedRoute>
+    </>
   )
 }
 

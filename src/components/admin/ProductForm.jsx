@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import adminApi from '../../services/adminApi';
+import ImageUploadDropzone from './ImageUploadDropzone';
+import GalleryUploadDropzone from './GalleryUploadDropzone';
 
 const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,7 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
     precio: '',
     stock: '',
     imagen_url: '',
+    galeria_imagenes: [],
     destacado: false,
     activo: true
   });
@@ -53,6 +56,7 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
         precio: product.precio || '',
         stock: product.stock || '',
         imagen_url: product.imagen_url || '',
+        galeria_imagenes: Array.isArray(product.galeria_imagenes) ? product.galeria_imagenes : [],
         destacado: product.destacado || false,
         activo: product.activo !== undefined ? product.activo : true
       });
@@ -88,22 +92,14 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
       newErrors.stock = 'El stock debe ser un número válido';
     }
 
-    if (formData.imagen_url && !isValidUrl(formData.imagen_url)) {
-      newErrors.imagen_url = 'La URL de la imagen no es válida';
+    if (!formData.imagen_url.trim()) {
+      newErrors.imagen_url = 'La imagen principal es obligatoria';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const isValidUrl = (string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -134,6 +130,30 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
         [name]: ''
       }));
     }
+  };
+
+  // Manejar la subida de imagen principal
+  const handleImageUploaded = (imageUrl, publicId) => {
+    setFormData(prev => ({
+      ...prev,
+      imagen_url: imageUrl
+    }));
+    
+    // Limpiar error de imagen si existe
+    if (errors.imagen_url) {
+      setErrors(prev => ({
+        ...prev,
+        imagen_url: ''
+      }));
+    }
+  };
+
+  // Manejar la subida de imágenes de galería
+  const handleGalleryImagesUploaded = (imageUrls, publicIds) => {
+    setFormData(prev => ({
+      ...prev,
+      galeria_imagenes: imageUrls
+    }));
   };
 
   if (loadingOptions) {
@@ -290,23 +310,25 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
         />
       </div>
 
-      {/* URL de Imagen */}
+      {/* Imagen Principal */}
       <div>
-        <label htmlFor="imagen_url" className="block text-sm font-medium text-gray-700 mb-1">
-          URL de Imagen
-        </label>
-        <input
-          type="url"
-          id="imagen_url"
-          name="imagen_url"
-          value={formData.imagen_url}
-          onChange={handleChange}
-          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            errors.imagen_url ? 'border-red-500' : 'border-gray-300'
-          }`}
-          placeholder="https://ejemplo.com/imagen.jpg"
+        <ImageUploadDropzone
+          onImageUploaded={handleImageUploaded}
+          existingImageUrl={formData.imagen_url}
+          disabled={loading}
+          label="Imagen Principal"
         />
         {errors.imagen_url && <p className="text-red-500 text-xs mt-1">{errors.imagen_url}</p>}
+      </div>
+
+      {/* Galería de Imágenes */}
+      <div>
+        <GalleryUploadDropzone
+          onImagesUploaded={handleGalleryImagesUploaded}
+          existingImages={formData.galeria_imagenes.map(url => ({ url, preview: url }))}
+          disabled={loading}
+          maxImages={10}
+        />
       </div>
 
       {/* Checkboxes */}
