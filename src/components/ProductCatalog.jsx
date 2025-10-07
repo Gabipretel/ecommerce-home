@@ -28,6 +28,7 @@ import {
 } from "lucide-react"
 import api from "../services/api"
 import { formatPrice } from "../utils/priceFormatter"
+import { getImageUrlWithFallback } from "../utils/imageUtils"
 
 const ProductCatalog = ({ categoryId, categoryName }) => {
   const navigate = useNavigate()
@@ -640,9 +641,12 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                       <CardContent className={`p-4 ${viewMode === "list" ? "flex w-full" : "flex flex-col h-full"}`}>
                         <div className={`product-image relative ${viewMode === "list" ? "w-48 flex-shrink-0 mr-6" : "mb-4"}`}>
                           <img
-                            src={product.imagen_url || "/placeholder.svg"}
+                            src={getImageUrlWithFallback(product.imagen_principal || product.imagen_url)}
                             alt={product.nombre}
                             className={`object-cover rounded-lg ${viewMode === "list" ? "w-full h-46 mt-2" : "w-full h-48"}`}
+                            onError={(e) => {
+                              e.target.src = "/placeholder.svg";
+                            }}
                           />
                           {/* {discount > 0 && (
                             <Badge className="absolute top-2 right-2 bg-red-600 text-white">-{discount}%</Badge>

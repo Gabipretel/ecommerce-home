@@ -223,10 +223,10 @@ const ProductManagement = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-16 w-16">
-                              {producto.imagen_url ? (
+                              {(producto.imagen_principal?.url || producto.imagen_principal.url) ? (
                                 <img 
                                   className="h-16 w-16 rounded-lg object-cover" 
-                                  src={producto.imagen_url} 
+                                  src={producto.imagen_principal?.url || producto.imagen_principal.url} 
                                   alt={producto.nombre}
                                   onError={(e) => {
                                     e.target.style.display = 'none';
@@ -235,7 +235,7 @@ const ProductManagement = () => {
                                 />
                               ) : null}
                               <div 
-                                className={`h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center ${producto.imagen_url ? 'hidden' : 'flex'}`}
+                                className={`h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center ${(producto.imagen_principal?.url || producto.imagen_principal.url) ? 'hidden' : 'flex'}`}
                               >
                                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

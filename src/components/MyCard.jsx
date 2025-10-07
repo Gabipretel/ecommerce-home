@@ -9,10 +9,11 @@ import Rating from "@mui/material/Rating";
 import Chip from "@mui/material/Chip";
 import { formatPrice } from "../utils/priceFormatter";
 import { useCupon } from "../context/CuponContext";
+import { getImageUrlWithFallback } from "../utils/imageUtils";
 const MyCard = ({
   nombre,
   precio,
-  imagen_url,
+  imagen_principal,
   rating,
   descuento,
   isCardProduct = true,
@@ -54,7 +55,7 @@ const MyCard = ({
           padding: 1,
         }}
         component="img"
-        image={imagen_url}
+        image={getImageUrlWithFallback(imagen_principal)}
         title={nombre}
       />
       <CardContent

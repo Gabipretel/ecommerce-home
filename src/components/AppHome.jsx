@@ -431,7 +431,7 @@ export default function AppHome() {
                 <CardContent className="p-4">
                   <div className="relative mb-4">
                     <img
-                      src={product.imagen_url || "/placeholder.svg"}
+                      src={product.imagen_principal.url || "/placeholder.svg"}
                       alt={product.nombre}
                       className="w-full h-48 object-cover rounded-lg"
                     />

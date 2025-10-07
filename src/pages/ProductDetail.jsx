@@ -29,6 +29,7 @@ import api from "../services/api"
 import { useCupon } from "../context/CuponContext"
 import CuponInput from "../components/CuponInput"
 import { formatPrice } from "../utils/priceFormatter"
+import { getAllImageUrls } from "../utils/imageUtils"
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -94,14 +95,13 @@ const ProductDetail = () => {
   const originalPrice = discount > 0 ? price / (1 - discount / 100) : price
   const precioConCupon = calcularPrecioConCupon(price)
 
-  // Crear array de imágenes combinando imagen principal y galería
-  const images = [];
-  if (producto.imagen_url) {
-    images.push(producto.imagen_url);
-  }
-  if (producto.galeria_imagenes && Array.isArray(producto.galeria_imagenes)) {
-    images.push(...producto.galeria_imagenes);
-  }
+  // Crear array de imágenes combinando imagen principal y galería usando utilidades
+  const images = getAllImageUrls(
+    producto.imagen_principal || producto.imagen_url, 
+    producto.galeria_imagenes
+  );
+  
+  console.log(images,'images')
   // Si no hay imágenes, usar placeholder
   if (images.length === 0) {
     images.push("/placeholder.svg");
@@ -206,7 +206,7 @@ const ProductDetail = () => {
             {/* Imagen Principal */}
             <div className="relative bg-slate-800/50 rounded-lg overflow-hidden">
               <img
-                src={images[selectedImage] || "/placeholder.svg"}
+                src={images[selectedImage]}
                 alt={producto.nombre}
                 className="w-full h-96 object-cover transition-opacity duration-300"
                 onError={(e) => {
@@ -269,7 +269,7 @@ const ProductDetail = () => {
                       }`}
                     >
                       <img
-                        src={image || "/placeholder.svg"}
+                        src={image}
                         alt={`${producto.nombre} ${index + 1}`}
                         className="w-full h-16 object-cover"
                         onError={(e) => {

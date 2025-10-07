@@ -13,7 +13,7 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
     sku: '',
     precio: '',
     stock: '',
-    imagen_url: '',
+    imagen_principal: { url: '', public_id: '' },
     galeria_imagenes: [],
     destacado: false,
     activo: true
@@ -55,8 +55,17 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
         sku: product.sku || '',
         precio: product.precio || '',
         stock: product.stock || '',
-        imagen_url: product.imagen_url || '',
-        galeria_imagenes: Array.isArray(product.galeria_imagenes) ? product.galeria_imagenes : [],
+        imagen_principal: {
+          url: product.imagen_principal?.url || product.imagen_url || '', 
+          public_id: product.imagen_principal?.public_id || product.imagen_public_id || ''
+        },
+        galeria_imagenes: Array.isArray(product.galeria_imagenes) 
+          ? product.galeria_imagenes.map(img => 
+              typeof img === 'string' 
+                ? { url: img, public_id: '' } 
+                : { url: img.url || img, public_id: img.public_id || '' }
+            ) 
+          : [],
         destacado: product.destacado || false,
         activo: product.activo !== undefined ? product.activo : true
       });
@@ -92,8 +101,8 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
       newErrors.stock = 'El stock debe ser un número válido';
     }
 
-    if (!formData.imagen_url.trim()) {
-      newErrors.imagen_url = 'La imagen principal es obligatoria';
+    if (!formData.imagen_principal.url.trim()) {
+      newErrors.imagen_principal = 'La imagen principal es obligatoria';
     }
 
     setErrors(newErrors);
@@ -110,7 +119,9 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
         stock: parseInt(formData.stock) || 0,
         id_categoria: parseInt(formData.id_categoria),
         id_marca: parseInt(formData.id_marca),
-        id_administrador: parseInt(formData.id_administrador)
+        id_administrador: parseInt(formData.id_administrador),
+        imagen_principal: formData.imagen_principal,
+        galeria_imagenes: formData.galeria_imagenes
       };
       onSubmit(submitData);
     }
@@ -136,23 +147,31 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
   const handleImageUploaded = (imageUrl, publicId) => {
     setFormData(prev => ({
       ...prev,
-      imagen_url: imageUrl
+      imagen_principal: {
+        url: imageUrl,
+        public_id: publicId
+      }
     }));
     
     // Limpiar error de imagen si existe
-    if (errors.imagen_url) {
+    if (errors.imagen_principal) {
       setErrors(prev => ({
         ...prev,
-        imagen_url: ''
+        imagen_principal: ''
       }));
     }
   };
 
   // Manejar la subida de imágenes de galería
   const handleGalleryImagesUploaded = (imageUrls, publicIds) => {
+    const galeriaImagenes = imageUrls.map((url, index) => ({
+      url: url,
+      public_id: publicIds[index] || ''
+    }));
+    
     setFormData(prev => ({
       ...prev,
-      galeria_imagenes: imageUrls
+      galeria_imagenes: galeriaImagenes
     }));
   };
 
@@ -314,18 +333,23 @@ const ProductForm = ({ product = null, onSubmit, onCancel, loading = false }) =>
       <div>
         <ImageUploadDropzone
           onImageUploaded={handleImageUploaded}
-          existingImageUrl={formData.imagen_url}
+          existingImageUrl={formData.imagen_principal.url}
+          existingPublicId={formData.imagen_principal.public_id}
           disabled={loading}
           label="Imagen Principal"
         />
-        {errors.imagen_url && <p className="text-red-500 text-xs mt-1">{errors.imagen_url}</p>}
+        {errors.imagen_principal && <p className="text-red-500 text-xs mt-1">{errors.imagen_principal}</p>}
       </div>
 
       {/* Galería de Imágenes */}
       <div>
         <GalleryUploadDropzone
           onImagesUploaded={handleGalleryImagesUploaded}
-          existingImages={formData.galeria_imagenes.map(url => ({ url, preview: url }))}
+          existingImages={formData.galeria_imagenes.map(img => ({ 
+            url: img.url || img, 
+            public_id: img.public_id || '',
+            preview: img.url || img 
+          }))}
           disabled={loading}
           maxImages={10}
         />

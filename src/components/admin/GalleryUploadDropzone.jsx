@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import api from '../../services/api';
 
 const GalleryUploadDropzone = ({ 
   onImagesUploaded, 
@@ -50,20 +51,13 @@ const GalleryUploadDropzone = ({
         formData.append('imagenes', file);
       });
       
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:3000/api/productos/upload/galeria', {
-        method: 'POST',
+      const response = await api.post('/productos/upload/galeria', formData, {
         headers: {
-          'Authorization': token ? `Bearer ${token}` : ''
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       });
       
-      if (!response.ok) {
-        throw new Error('Error al subir imágenes');
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       
       // Crear objetos de imagen con preview y datos de Cloudinary
       const newImages = data.data.map((img, index) => ({
@@ -76,9 +70,10 @@ const GalleryUploadDropzone = ({
       const updatedImages = [...images, ...newImages];
       setImages(updatedImages);
       
-      // Notificar al componente padre
+      // Notificar al componente padre con la nueva estructura
       const imageUrls = updatedImages.map(img => img.url);
-      onImagesUploaded(imageUrls, updatedImages.map(img => img.public_id));
+      const publicIds = updatedImages.map(img => img.public_id);
+      onImagesUploaded(imageUrls, publicIds);
       
       return data.data;
     } catch (error) {
@@ -93,17 +88,14 @@ const GalleryUploadDropzone = ({
     const imageToRemove = images[index];
     
     try {
-      // Llamar al endpoint para eliminar la imagen de Cloudinary
+      // Solo eliminar de Cloudinary si tiene public_id (imagen ya subida)
       if (imageToRemove.public_id) {
-        const token = localStorage.getItem('accessToken');
-        await fetch(`http://localhost:3000/api/productos/imagen/${imageToRemove.public_id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': token ? `Bearer ${token}` : ''
-          }
-        });
+        console.log('Eliminando imagen de Cloudinary:', imageToRemove.public_id);
+        await api.delete(`/productos/imagen/${imageToRemove.public_id}`);
+      } else {
+        console.log('Imagen sin public_id, solo eliminando del estado local');
       }
-      
+
       // Actualizar estado local
       const updatedImages = images.filter((_, i) => i !== index);
       setImages(updatedImages);
@@ -113,11 +105,13 @@ const GalleryUploadDropzone = ({
         URL.revokeObjectURL(imageToRemove.preview);
       }
       
-      // Notificar al componente padre
+      // Notificar al componente padre con la nueva estructura
       const imageUrls = updatedImages.map(img => img.url);
-      onImagesUploaded(imageUrls, updatedImages.map(img => img.public_id));
+      const publicIds = updatedImages.map(img => img.public_id);
+      onImagesUploaded(imageUrls, publicIds);
       
     } catch (error) {
+      console.error('Error al eliminar imagen:', error);
       setError('Error al eliminar imagen: ' + error.message);
     }
   };
@@ -261,7 +255,8 @@ const GalleryUploadDropzone = ({
                   type="button"
                   onClick={() => removeImage(index)}
                   disabled={disabled}
-                  className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                  title="Eliminar imagen"
                 >
                   ✕
                 </button>

@@ -1,14 +1,17 @@
 import React, { useState, useCallback } from 'react';
+import api from '../../services/api';
 
 const ImageUploadDropzone = ({ 
   onImageUploaded, 
   existingImageUrl = '', 
+  existingPublicId = '',
   disabled = false,
   label = "Imagen Principal"
 }) => {
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(existingImageUrl);
+  const [publicId, setPublicId] = useState(existingPublicId);
   const [error, setError] = useState('');
 
   // Configuración de validación
@@ -40,24 +43,18 @@ const ImageUploadDropzone = ({
       const formData = new FormData();
       formData.append('imagen', file);
       
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:3000/api/productos/upload/imagen-principal', {
-        method: 'POST',
+      const response = await api.post('/productos/upload/imagen-principal', formData, {
         headers: {
-          'Authorization': token ? `Bearer ${token}` : ''
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       });
       
-      if (!response.ok) {
-        throw new Error('Error al subir imagen');
-      }
-      
-      const data = await response.json();
+      const data = response.data;
       const imageUrl = data.data.url;
       
       // Actualizar preview y notificar al componente padre
       setPreview(imageUrl);
+      setPublicId(data.data.public_id);
       onImageUploaded(imageUrl, data.data.public_id);
       
       return data.data;
@@ -122,10 +119,26 @@ const ImageUploadDropzone = ({
     }
   }, [disabled]);
 
-  const removeImage = () => {
-    setPreview('');
-    setError('');
-    onImageUploaded('', '');
+  const removeImage = async () => {
+    try {
+      // Solo eliminar de Cloudinary si tiene public_id (imagen ya subida)
+      if (publicId) {
+        console.log('Eliminando imagen principal de Cloudinary:', publicId);
+        await api.delete(`/productos/imagen/${publicId}`);
+      } else {
+        console.log('Imagen principal sin public_id, solo eliminando del estado local');
+      }
+
+      // Actualizar estado local
+      setPreview('');
+      setPublicId('');
+      setError('');
+      onImageUploaded('', '');
+      
+    } catch (error) {
+      console.error('Error al eliminar imagen principal:', error);
+      setError('Error al eliminar imagen: ' + error.message);
+    }
   };
 
   return (
