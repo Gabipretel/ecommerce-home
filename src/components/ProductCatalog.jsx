@@ -25,10 +25,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
+  LogOut,
+  Settings
 } from "lucide-react"
 import api from "../services/api"
 import { formatPrice } from "../utils/priceFormatter"
 import { getImageUrlWithFallback } from "../utils/imageUtils"
+import { useAuth } from "../context/AuthContext"
 
 const ProductCatalog = ({ categoryId, categoryName }) => {
   const navigate = useNavigate()
@@ -45,6 +48,9 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
   const [brands, setBrands] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  // Usar el contexto de autenticación
+  const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
 
   const [activeFilters, setActiveFilters] = useState({
     categories: categoryId ? [categoryName] : [],
@@ -186,6 +192,28 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
     return { text: "En Stock", color: "bg-green-600", textColor: "text-green-100" }
   }
 
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setIsMenuOpen(false)
+      // No necesitamos navigate() aquí, el estado se actualizará automáticamente
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    }
+  }
+
+  const handleLogin = () => {
+    navigate('/login-user')
+  }
+
+  const handleRegister = () => {
+    navigate('/register-user')
+  }
+
+  const handleAdminPanel = () => {
+    navigate('/admin')
+  }
+
   if (loading) {
     return <LoadingOverlay isLoading={true} message="Cargando productos..." />
   }
@@ -250,10 +278,52 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="text-slate-300 hover:text-white">
-                <User className="w-4 h-4 mr-2" />
-                Mi Cuenta
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-2 text-slate-300">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">Hola, {String(currentUser?.email || '').split('@')[0] || 'Usuario'}</span>
+                  </div>
+                  
+                  {userType === 'admin' && (
+                    <Button 
+                      variant="ghost" 
+                      className="text-slate-300 hover:text-white"
+                      onClick={handleAdminPanel}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Panel Admin
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar Sesión
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white"
+                    onClick={handleLogin}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Iniciar Sesión
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    onClick={handleRegister}
+                  >
+                    Registrarse
+                  </Button>
+                </>
+              )}
+              
               <Button variant="ghost" className="text-slate-300 hover:text-white relative">
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Carrito
@@ -303,15 +373,59 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                 className="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
               />
             </div>
-            <Button variant="ghost" className="text-slate-300 hover:text-white justify-start">
-              <User className="w-4 h-4 mr-2" />
-              Mi Cuenta
-            </Button>
-            <Button variant="ghost" className="text-slate-300 hover:text-white justify-start relative">
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Carrito
-              <Badge className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs">3</Badge>
-            </Button>
+            
+            <div className="flex flex-col space-y-2">
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-2 text-slate-300 px-3 py-2">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">Hola, {String(currentUser?.email || '').split('@')[0] || 'Usuario'}</span>
+                  </div>
+                  
+                  {userType === 'admin' && (
+                    <Button 
+                      variant="ghost" 
+                      className="text-slate-300 hover:text-white justify-start"
+                      onClick={handleAdminPanel}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Panel Admin
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white justify-start"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar Sesión
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white justify-start"
+                    onClick={handleLogin}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Iniciar Sesión
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white justify-start"
+                    onClick={handleRegister}
+                  >
+                    Registrarse
+                  </Button>
+                </>
+              )}
+              
+              <Button variant="ghost" className="text-slate-300 hover:text-white justify-start">
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Carrito (3)
+              </Button>
+            </div>
           </div>
         </div>
       )}

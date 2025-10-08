@@ -24,12 +24,15 @@ import {
   Minus,
   ChevronLeft,
   ChevronRight,
+  LogOut,
+  Settings
 } from "lucide-react"
 import api from "../services/api"
 import { useCupon } from "../context/CuponContext"
 import CuponInput from "../components/CuponInput"
 import { formatPrice } from "../utils/priceFormatter"
 import { getAllImageUrls } from "../utils/imageUtils"
+import { useAuth } from "../context/AuthContext"
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -40,8 +43,10 @@ const ProductDetail = () => {
   const [producto, setProducto] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { cuponActivo, calcularPrecioConCupon } = useCupon()
+
+  // Usar el contexto de autenticación
+  const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
 
   useEffect(() => {
     const getProducto = async () => {
@@ -61,6 +66,28 @@ const ProductDetail = () => {
       getProducto()
     }
   }, [id])
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setIsMenuOpen(false)
+      // No necesitamos navigate() aquí, el estado se actualizará automáticamente
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    }
+  }
+
+  const handleLogin = () => {
+    navigate('/login-user')
+  }
+
+  const handleRegister = () => {
+    navigate('/register-user')
+  }
+
+  const handleAdminPanel = () => {
+    navigate('/admin')
+  }
 
   if (loading) {
     return (
@@ -164,10 +191,52 @@ const ProductDetail = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button variant="ghost" className="text-slate-300 hover:text-white">
-                <User className="w-4 h-4 mr-2" />
-                {isLoggedIn ? "Mi Cuenta" : "Iniciar Sesión"}
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-2 text-slate-300">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">Hola, {String(currentUser?.email || '').split('@')[0] || 'Usuario'}</span>
+                  </div>
+                  
+                  {userType === 'admin' && (
+                    <Button 
+                      variant="ghost" 
+                      className="text-slate-300 hover:text-white"
+                      onClick={handleAdminPanel}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Panel Admin
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar Sesión
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white"
+                    onClick={handleLogin}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Iniciar Sesión
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    onClick={handleRegister}
+                  >
+                    Registrarse
+                  </Button>
+                </>
+              )}
+              
               <Button variant="ghost" className="text-slate-300 hover:text-white relative">
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Carrito
@@ -182,6 +251,95 @@ const ProductDetail = () => {
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="fixed top-0 left-0 w-full h-screen bg-slate-900/95 backdrop-blur-md z-50 flex flex-col md:hidden">
+          <div className="px-4 py-6 border-b border-slate-700">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2" onClick={() => navigate('/')}>
+                <div className="relative">
+                  <Gamepad2 className="w-8 h-8 text-purple-400" />
+                  <Zap className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    GG
+                  </h1>
+                  <p className="text-xs text-slate-400 -mt-1">Gamer once, Gamer always</p>
+                </div>
+              </div>
+              <Button variant="ghost" className="text-slate-300" onClick={() => setIsMenuOpen(false)}>
+                <X className="w-6 h-6" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="p-4 flex flex-col space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Buscar productos, marcas o categorías..."
+                className="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-2 text-slate-300 px-3 py-2">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">Hola, {String(currentUser?.email || '').split('@')[0] || 'Usuario'}</span>
+                  </div>
+                  
+                  {userType === 'admin' && (
+                    <Button 
+                      variant="ghost" 
+                      className="text-slate-300 hover:text-white justify-start"
+                      onClick={handleAdminPanel}
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Panel Admin
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white justify-start"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Cerrar Sesión
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white justify-start"
+                    onClick={handleLogin}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Iniciar Sesión
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white justify-start"
+                    onClick={handleRegister}
+                  >
+                    Registrarse
+                  </Button>
+                </>
+              )}
+              
+              <Button variant="ghost" className="text-slate-300 hover:text-white justify-start">
+                <ShoppingCart className="w-4 h-4 mr-2" />
+                Carrito (3)
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Breadcrumb */}
       <div className="bg-slate-800/30 border-b border-slate-700">

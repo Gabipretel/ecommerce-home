@@ -147,6 +147,16 @@ export default function AppHome() {
     navigate('/admin')
   }
 
+  const scrollToFeaturedProducts = () => {
+    const featuredSection = document.getElementById('productos-destacados')
+    if (featuredSection) {
+      featuredSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
@@ -305,8 +315,11 @@ export default function AppHome() {
               periféricos profesionales.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg">
-                Ver Ofertas
+              <Button 
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
+                onClick={scrollToFeaturedProducts}
+              >
+                Productos Destacados
               </Button>
               <Button
                 variant="outline"
@@ -368,7 +381,7 @@ export default function AppHome() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 px-4 bg-slate-800/20">
+      <section id="productos-destacados" className="py-16 px-4 bg-slate-800/20">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-white text-center mb-12">Productos Destacados</h2>
           
