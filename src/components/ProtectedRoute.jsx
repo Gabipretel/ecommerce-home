@@ -1,16 +1,14 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
-import authService from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 
 // Componente para proteger rutas de autenticación cuando el usuario ya está logueado
 const AuthProtectedRoute = ({ children }) => {
   const navigate = useNavigate()
+  const { isAuthenticated, userType, loading } = useAuth()
 
   useEffect(() => {
-    const isAuthenticated = authService.isAuthenticated()
-    const userType = authService.getUserType()
-    
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       // Si el usuario ya está autenticado, redirigir según su tipo
       if (userType === 'admin') {
         navigate('/admin', { replace: true })
@@ -18,10 +16,19 @@ const AuthProtectedRoute = ({ children }) => {
         navigate('/', { replace: true })
       }
     }
-  }, [navigate])
+  }, [isAuthenticated, userType, loading, navigate])
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+      </div>
+    )
+  }
 
   // Si no está autenticado, mostrar el componente hijo (login/register)
-  if (!authService.isAuthenticated()) {
+  if (!isAuthenticated) {
     return children
   }
 
@@ -32,20 +39,26 @@ const AuthProtectedRoute = ({ children }) => {
 // Componente para proteger rutas de admin
 const AdminProtectedRoute = ({ children }) => {
   const navigate = useNavigate()
+  const { isAuthenticated, userType, loading } = useAuth()
 
   useEffect(() => {
-    const isAuthenticated = authService.isAuthenticated()
-    const userType = authService.getUserType()
-    
-    if (!isAuthenticated) {
-      navigate('/login-admin', { replace: true })
-    } else if (userType !== 'admin') {
-      navigate('/', { replace: true })
+    if (!loading) {
+      if (!isAuthenticated) {
+        navigate('/login-admin', { replace: true })
+      } else if (userType !== 'admin') {
+        navigate('/', { replace: true })
+      }
     }
-  }, [navigate])
+  }, [isAuthenticated, userType, loading, navigate])
 
-  const isAuthenticated = authService.isAuthenticated()
-  const userType = authService.getUserType()
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    )
+  }
 
   if (isAuthenticated && userType === 'admin') {
     return children
@@ -57,16 +70,24 @@ const AdminProtectedRoute = ({ children }) => {
 // Componente para proteger rutas de usuario
 const UserProtectedRoute = ({ children }) => {
   const navigate = useNavigate()
+  const { isAuthenticated, loading } = useAuth()
 
   useEffect(() => {
-    const isAuthenticated = authService.isAuthenticated()
-    
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       navigate('/login-user', { replace: true })
     }
-  }, [navigate])
+  }, [isAuthenticated, loading, navigate])
 
-  if (authService.isAuthenticated()) {
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+      </div>
+    )
+  }
+
+  if (isAuthenticated) {
     return children
   }
 
@@ -74,3 +95,4 @@ const UserProtectedRoute = ({ children }) => {
 }
 
 export { AuthProtectedRoute, AdminProtectedRoute, UserProtectedRoute }
+

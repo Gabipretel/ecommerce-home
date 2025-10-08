@@ -1,10 +1,13 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useSidebar } from '../../context/SidebarContext';
+import { useAuth } from '../../context/AuthContext';
 
 const AdminLayout = ({ children }) => {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
   const menuItems = [
     {
@@ -49,6 +52,15 @@ const AdminLayout = ({ children }) => {
     if (path === '/admin' && location.pathname === '/admin') return true;
     if (path !== '/admin' && location.pathname.startsWith(path)) return true;
     return false;
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   return (
@@ -101,9 +113,9 @@ const AdminLayout = ({ children }) => {
 
         {/* Logout Button */}
         <div className="absolute bottom-4 left-0 right-0 px-2">
-          <Link
-            to="/"
-            className="flex items-center px-4 py-3 mx-2 rounded-lg text-red-600 hover:bg-red-50/80 transition-colors"
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center px-4 py-3 mx-2 rounded-lg text-red-600 hover:bg-red-50/80 transition-colors"
             title={!isSidebarOpen ? "Cerrar Sesión" : ""}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +124,7 @@ const AdminLayout = ({ children }) => {
             <span className={`ml-3 ${isSidebarOpen ? 'block' : 'hidden'} transition-all duration-300`}>
               Cerrar Sesión
             </span>
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -123,11 +135,17 @@ const AdminLayout = ({ children }) => {
           <div className="flex items-center justify-end">
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-700">Admin User</p>
-                <p className="text-xs text-purple-600">admin@example.com</p>
+                <p className="text-sm font-medium text-gray-700">
+                  {user ? `${user.nombre || 'Admin'} ${user.apellido || 'User'}` : 'Admin User'}
+                </p>
+                <p className="text-xs text-purple-600">
+                  {user?.email || 'admin@example.com'}
+                </p>
               </div>
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200">
-                <span className="text-white font-medium text-sm">A</span>
+                <span className="text-white font-medium text-sm">
+                  {user?.nombre ? user.nombre.charAt(0).toUpperCase() : 'A'}
+                </span>
               </div>
             </div>
           </div>

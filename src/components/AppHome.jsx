@@ -6,7 +6,6 @@ import { Badge } from "./ui/badge"
 import {
   Gamepad2,
   Zap,
-  Search,
   ShoppingCart,
   User,
   Menu,
@@ -25,16 +24,17 @@ import {
   LogOut,
   Settings
 } from "lucide-react"
-import authService from "../services/authService"
+import { useAuth } from "../context/AuthContext"
 import api from "../services/api"
 import { formatPrice } from "../utils/priceFormatter"
 
 export default function AppHome() {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userType, setUserType] = useState(null)
-  const [currentUser, setCurrentUser] = useState(null)
+  
+  // Usar el contexto de autenticación
+  const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
+  
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -67,26 +67,6 @@ export default function AppHome() {
   }
 
   const brands = ["NVIDIA", "AMD", "Logitech", "Samsung", "Corsair", "Razer", "Intel", "Gamemax"]
-
-  // Verificar autenticación al cargar el componente
-  useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = authService.isAuthenticated()
-      const type = authService.getUserType()
-      const user = authService.getCurrentUser()
-      
-      setIsAuthenticated(authenticated)
-      setUserType(type)
-      setCurrentUser(user)
-    }
-    
-    checkAuth()
-    
-    // Escuchar cambios en el localStorage
-    window.addEventListener('storage', checkAuth)
-    
-    return () => window.removeEventListener('storage', checkAuth)
-  }, [])
 
   // Cargar categorías desde la API
   useEffect(() => {
@@ -145,12 +125,14 @@ export default function AppHome() {
     getFeaturedProducts()
   }, [])
 
-  const handleLogout = () => {
-    authService.logout()
-    setIsAuthenticated(false)
-    setUserType(null)
-    setCurrentUser(null)
-    setIsMenuOpen(false)
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setIsMenuOpen(false)
+      // No necesitamos navigate() aquí, el estado se actualizará automáticamente
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    }
   }
 
   const handleLogin = () => {
@@ -182,18 +164,6 @@ export default function AppHome() {
                   GG
                 </h1>
                 <p className="text-xs text-slate-400 -mt-1 hidden sm:block">Gamer once, Gamer always</p>
-              </div>
-            </div>
-
-            {/* Search Bar - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Buscar productos..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
-                />
               </div>
             </div>
 
@@ -262,14 +232,6 @@ export default function AppHome() {
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-slate-700">
               <div className="space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Buscar productos..."
-                    className="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
-                  />
-                </div>
                 <div className="flex flex-col space-y-2">
                   {isAuthenticated ? (
                     <>

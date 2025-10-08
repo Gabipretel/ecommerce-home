@@ -120,6 +120,7 @@ class AuthService {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
     localStorage.removeItem('userType')
+    localStorage.removeItem('googleUser')
   }
 
   // Verificar si está autenticado
@@ -144,6 +145,26 @@ class AuthService {
     
     if (!token || !userType) {
       return null
+    }
+
+    // Verificar si es usuario de Google
+    const googleUser = localStorage.getItem('googleUser')
+    if (googleUser && token.startsWith('google_')) {
+      try {
+        const parsedGoogleUser = JSON.parse(googleUser)
+        return {
+          id: parsedGoogleUser.uid,
+          email: parsedGoogleUser.email,
+          nombre: parsedGoogleUser.nombre,
+          apellido: parsedGoogleUser.apellido,
+          type: 'user',
+          provider: 'google',
+          photoURL: parsedGoogleUser.photoURL
+        }
+      } catch (error) {
+        console.error('Error parseando usuario de Google:', error)
+        return null
+      }
     }
 
     try {

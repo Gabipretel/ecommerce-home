@@ -15,7 +15,7 @@ import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
 import { Link } from "react-router";
-import authService from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
   const pages = [
@@ -29,21 +29,7 @@ function NavBar() {
   const settings = ["Cuenta", "Mis pedidos", "Favoritos", "Panel Admin", "Cerrar sesión"];
   const [openMenu, setOpenMenu] = useState(null);
   const [openMenuUser, setOpenMenuUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userType, setUserType] = useState(null);
-
-  useEffect(() => {
-    const checkAuth = () => {
-      setIsAuthenticated(authService.isAuthenticated());
-      setUserType(authService.getUserType());
-    };
-    
-    checkAuth();
-    // Verificar autenticación cada vez que se carga la página
-    window.addEventListener('storage', checkAuth);
-    
-    return () => window.removeEventListener('storage', checkAuth);
-  }, []);
+  const { isAuthenticated, userType, user, logout } = useAuth();
 
   const handleOpenNavMenu = () => {
     setOpenMenu(true);
@@ -60,12 +46,13 @@ function NavBar() {
     setOpenMenuUser(false);
   };
 
-  const handleLogout = () => {
-    authService.logout();
-    setIsAuthenticated(false);
-    setUserType(null);
-    setOpenMenuUser(false);
-
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setOpenMenuUser(false);
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   return (
@@ -178,25 +165,32 @@ function NavBar() {
                   open={openMenuUser}
                   onClose={handleCloseUserMenu}
                 >
-                  {settings.map((setting) => (
-                    <MenuItem key={setting} onClick={setting === "Cerrar sesión" ? handleLogout : handleCloseUserMenu}>
-                      {setting === "Panel Admin" && userType === "admin" ? (
-                        <Link to="/admin" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  {settings.map((setting) => {
+                    // No mostrar "Panel Admin" si no es admin
+                    if (setting === "Panel Admin" && userType !== "admin") {
+                      return null;
+                    }
+                    
+                    return (
+                      <MenuItem key={setting} onClick={setting === "Cerrar sesión" ? handleLogout : handleCloseUserMenu}>
+                        {setting === "Panel Admin" && userType === "admin" ? (
+                          <Link to="/admin" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <Typography sx={{ textAlign: "center" }}>
+                              {setting}
+                            </Typography>
+                          </Link>
+                        ) : setting === "Cerrar sesión" ? (
                           <Typography sx={{ textAlign: "center" }}>
                             {setting}
                           </Typography>
-                        </Link>
-                      ) : setting === "Cerrar sesión" ? (
-                        <Typography sx={{ textAlign: "center" }}>
-                          {setting}
-                        </Typography>
-                      ) : (
-                        <Typography sx={{ textAlign: "center" }}>
-                          {setting}
-                        </Typography>
-                      )}
-                    </MenuItem>
-                  ))}
+                        ) : (
+                          <Typography sx={{ textAlign: "center" }}>
+                            {setting}
+                          </Typography>
+                        )}
+                      </MenuItem>
+                    );
+                  })}
                 </Menu>
               </>
             ) : (
