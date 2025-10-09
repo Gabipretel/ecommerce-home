@@ -419,7 +419,7 @@ export default function AppHome() {
                 className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-all duration-300 group cursor-pointer"
                 onClick={() => navigate(`/productos/${product.id}`)}
               >
-                <CardContent className="p-4">
+                <CardContent className="p-4 mt-4">
                   <div className="relative mb-4">
                     <img
                       src={product.imagen_principal.url || "/placeholder.svg"}

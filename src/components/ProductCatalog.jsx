@@ -768,7 +768,7 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                       }`}
                       onClick={() => navigate(`/productos/${product.id}`)}
                     >
-                      <CardContent className={`p-4 ${viewMode === "list" ? "flex w-full" : "flex flex-col h-full"}`}>
+                      <CardContent className={`p-4 mt-4 ${viewMode === "list" ? "flex w-full" : "flex flex-col h-full"}`}>
                         <div className={`product-image relative ${viewMode === "list" ? "w-48 flex-shrink-0 mr-6" : "mb-4"}`}>
                           <img
                             src={getImageUrlWithFallback(product.imagen_principal || product.imagen_url)}

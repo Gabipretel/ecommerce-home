@@ -175,7 +175,7 @@ const ProductDetail = () => {
     "Marca": producto.marca?.nombre || 'Sin especificar',
     "Categoría": producto.categoria?.nombre || 'Sin especificar',
     "Stock": producto.stock || 0,
-    "Estado": producto.activo ? 'Activo' : 'Inactivo'
+    "Estado": 'Nuevo'
   }
 
   return (
@@ -198,17 +198,8 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Search Bar - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Buscar productos, marcas o categorías..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
-                />
-              </div>
-            </div>
+            {/* Spacer for layout */}
+            <div className="flex-1"></div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
@@ -293,15 +284,6 @@ const ProductDetail = () => {
           </div>
 
           <div className="p-4 flex flex-col space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Buscar productos, marcas o categorías..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
-              />
-            </div>
-            
             <div className="flex flex-col space-y-2">
               {isAuthenticated ? (
                 <>
@@ -371,8 +353,8 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="container mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
           {/* Galería de Imágenes */}
           <div className="space-y-4">
             {/* Imagen Principal */}
@@ -478,7 +460,6 @@ const ProductDetail = () => {
               </div>
 
               <h1 className="text-3xl font-bold text-white mb-2">{producto.nombre}</h1>
-              <p className="text-slate-400 text-sm">ID: {producto.id}</p>
 
               {/* Rating simulado */}
               <div className="flex items-center space-x-2 mt-3">
@@ -534,8 +515,8 @@ const ProductDetail = () => {
             </div>
 
             {/* Cupón Input */}
-            <div className="bg-slate-800/30 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-white mb-3">¿Tienes un cupón?</h3>
+            <div className="bg-slate-800/30 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">¿Tienes un cupón?</h3>
               <CuponInput />
             </div>
 
@@ -635,24 +616,24 @@ const ProductDetail = () => {
         </div>
 
         {/* Tabs de información adicional */}
-        <div className="mt-8">
+        <div className="mt-12">
           <div className="border-b border-slate-700">
             <nav className="-mb-px flex space-x-8">
-              <button className="border-purple-500 text-purple-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+              <button className="border-purple-500 text-purple-400 whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm">
                 Especificaciones
               </button>
             </nav>
           </div>
           
-          <div className="mt-6">
+          <div className="mt-8">
             <Card className="bg-slate-800/50 border-slate-700">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Especificaciones Técnicas</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="p-8 mt-4">
+                <h3 className="text-xl font-bold text-white mb-6">Especificaciones Técnicas</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {Object.entries(specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-slate-700">
+                    <div key={key} className="flex justify-between py-3 border-b border-slate-700 last:border-b-0">
                       <span className="text-slate-400 font-medium">{key}:</span>
-                      <span className="text-white">{value}</span>
+                      <span className="text-white font-semibold">{value}</span>
                     </div>
                   ))}
                 </div>

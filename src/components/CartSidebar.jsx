@@ -97,7 +97,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
             <div className="p-4 space-y-4">
               {items.map((item) => (
                 <Card key={item.id} className="bg-slate-800/50 border-slate-700">
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 mt-4">
                     <div className="flex space-x-4">
                       {/* Imagen del producto */}
                       <div className="w-16 h-16 flex-shrink-0">
