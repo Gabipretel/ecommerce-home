@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Gamepad2, Shield, Eye, EyeOff } from 'lucide-react'
 import AuthModal from '../components/AuthModal'
-import authService from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 import { AuthProtectedRoute } from '../components/ProtectedRoute'
 
 const AdminLogin = () => {
   const navigate = useNavigate()
+  const { loginAdmin } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -49,7 +50,7 @@ const AdminLogin = () => {
     setIsSubmitting(true)
 
     try {
-      const result = await authService.loginAdmin(formData.email, formData.password)
+      const result = await loginAdmin(formData.email, formData.password)
 
       if (result.success) {
         setModal({
