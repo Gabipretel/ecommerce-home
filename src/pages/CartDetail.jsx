@@ -299,7 +299,7 @@ const CartDetail = () => {
 
               {items.map((item) => (
                 <Card key={item.id} className="bg-slate-800/50 border-slate-700">
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 mt-4">
                     <div className="flex space-x-6">
                       {/* Imagen del producto */}
                       <div className="w-24 h-24 flex-shrink-0">
@@ -397,7 +397,7 @@ const CartDetail = () => {
             {/* Resumen del pedido */}
             <div className="lg:col-span-1">
               <Card className="bg-slate-800/50 border-slate-700 sticky top-24">
-                <CardContent className="p-6">
+                <CardContent className="p-6 mt-4">
                   <h3 className="text-xl font-bold text-white mb-6">Resumen del Pedido</h3>
                   
                   <div className="space-y-4 mb-6">
