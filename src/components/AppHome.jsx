@@ -25,15 +25,24 @@ import {
   Settings
 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
 import api from "../services/api"
 import { formatPrice } from "../utils/priceFormatter"
+import CartSummary from "./CartSummary"
+import CartSidebar from "./CartSidebar"
+import StockModal from "./StockModal"
 
 export default function AppHome() {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [stockModal, setStockModal] = useState({ isOpen: false, message: '' })
   
   // Usar el contexto de autenticación
   const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
+  
+  // Usar el contexto del carrito
+  const { addToCart, canAddToCart } = useCart()
   
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
@@ -157,6 +166,20 @@ export default function AppHome() {
     }
   }
 
+  const handleAddToCart = (product, e) => {
+    e.stopPropagation() 
+    
+    if (canAddToCart(product, 1)) {
+      addToCart(product, 1)
+      console.log(`Producto ${product.nombre} agregado al carrito`)
+    } else {
+      setStockModal({
+        isOpen: true,
+        message: `No hay más stock disponible para ${product.nombre}. Solo quedan ${product.stock || 0} unidades.`
+      })
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
@@ -225,11 +248,7 @@ export default function AppHome() {
                 </>
               )}
               
-              <Button variant="ghost" className="text-slate-300 hover:text-white relative">
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Carrito
-                <Badge className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs">3</Badge>
-              </Button>
+              <CartSummary onClick={() => setIsCartOpen(true)} />
             </div>
 
             {/* Mobile Menu Button */}
@@ -289,10 +308,7 @@ export default function AppHome() {
                     </>
                   )}
                   
-                  <Button variant="ghost" className="text-slate-300 hover:text-white justify-start">
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Carrito (3)
-                  </Button>
+                  <CartSummary onClick={() => setIsCartOpen(true)} isMobile={true} />
                 </div>
               </div>
             </div>
@@ -438,8 +454,12 @@ export default function AppHome() {
                         <span className="text-orange-400 text-sm">¡Pocas unidades!</span>
                       )}
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                      Agregar al Carrito
+                    <Button 
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                      onClick={(e) => handleAddToCart(product, e)}
+                      disabled={!product.stock || product.stock === 0}
+                    >
+                      {!product.stock || product.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito'}
                     </Button>
                   </div>
                 </CardContent>
@@ -588,6 +608,17 @@ export default function AppHome() {
           </div>
         </div>
       </footer>
+
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Stock Modal */}
+      <StockModal
+        isOpen={stockModal.isOpen}
+        onClose={() => setStockModal({ isOpen: false, message: '' })}
+        message={stockModal.message}
+        type="warning"
+      />
     </div>
   )
 }

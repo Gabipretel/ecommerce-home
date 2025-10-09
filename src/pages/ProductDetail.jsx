@@ -33,11 +33,17 @@ import CuponInput from "../components/CuponInput"
 import { formatPrice } from "../utils/priceFormatter"
 import { getAllImageUrls } from "../utils/imageUtils"
 import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
+import CartSummary from "../components/CartSummary"
+import CartSidebar from "../components/CartSidebar"
+import StockModal from "../components/StockModal"
 
 const ProductDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [stockModal, setStockModal] = useState({ isOpen: false, message: '' })
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [producto, setProducto] = useState(null)
@@ -47,6 +53,9 @@ const ProductDetail = () => {
 
   // Usar el contexto de autenticación
   const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
+
+  // Usar el contexto del carrito
+  const { addToCart, canAddToCart } = useCart()
 
   useEffect(() => {
     const getProducto = async () => {
@@ -87,6 +96,18 @@ const ProductDetail = () => {
 
   const handleAdminPanel = () => {
     navigate('/admin')
+  }
+
+  const handleAddToCart = () => {
+    if (canAddToCart(producto, quantity)) {
+      addToCart(producto, quantity)
+      console.log(`Agregado ${quantity} unidades de ${producto.nombre} al carrito`)
+    } else {
+      setStockModal({
+        isOpen: true,
+        message: `No hay suficiente stock disponible para ${producto.nombre}. Solo quedan ${producto.stock || 0} unidades.`
+      })
+    }
   }
 
   if (loading) {
@@ -237,11 +258,7 @@ const ProductDetail = () => {
                 </>
               )}
               
-              <Button variant="ghost" className="text-slate-300 hover:text-white relative">
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Carrito
-                <Badge className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs">3</Badge>
-              </Button>
+              <CartSummary onClick={() => setIsCartOpen(true)} />
             </div>
 
             {/* Mobile Menu Button */}
@@ -332,10 +349,7 @@ const ProductDetail = () => {
                 </>
               )}
               
-              <Button variant="ghost" className="text-slate-300 hover:text-white justify-start">
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Carrito (3)
-              </Button>
+              <CartSummary onClick={() => setIsCartOpen(true)} isMobile={true} />
             </div>
           </div>
         </div>
@@ -572,6 +586,7 @@ const ProductDetail = () => {
                 <Button
                   className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 text-lg"
                   disabled={producto.stock === 0}
+                  onClick={handleAddToCart}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   {producto.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito'}
@@ -646,6 +661,17 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Cart Sidebar */}
+      <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Stock Modal */}
+      <StockModal
+        isOpen={stockModal.isOpen}
+        onClose={() => setStockModal({ isOpen: false, message: '' })}
+        message={stockModal.message}
+        type="warning"
+      />
     </div>
   )
 };

@@ -32,11 +32,17 @@ import api from "../services/api"
 import { formatPrice } from "../utils/priceFormatter"
 import { getImageUrlWithFallback } from "../utils/imageUtils"
 import { useAuth } from "../context/AuthContext"
+import { useCart } from "../context/CartContext"
+import CartSummary from "./CartSummary"
+import CartSidebar from "./CartSidebar"
+import StockModal from "./StockModal"
 
 const ProductCatalog = ({ categoryId, categoryName }) => {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [stockModal, setStockModal] = useState({ isOpen: false, message: '' })
   const [viewMode, setViewMode] = useState("grid")
   const [currentPage, setCurrentPage] = useState(1)
   const [priceRange, setPriceRange] = useState([0, 2000])
@@ -51,6 +57,9 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
 
   // Usar el contexto de autenticación
   const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
+
+  // Usar el contexto del carrito
+  const { addToCart, canAddToCart } = useCart()
 
   const [activeFilters, setActiveFilters] = useState({
     categories: categoryId ? [categoryName] : [],
@@ -214,6 +223,20 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
     navigate('/admin')
   }
 
+  const handleAddToCart = (product, e) => {
+    e.stopPropagation() // Evitar navegación al hacer clic en el botón
+    
+    if (canAddToCart(product, 1)) {
+      addToCart(product, 1)
+      console.log(`Producto ${product.nombre} agregado al carrito`)
+    } else {
+      setStockModal({
+        isOpen: true,
+        message: `No hay más stock disponible para ${product.nombre}. Solo quedan ${product.stock || 0} unidades.`
+      })
+    }
+  }
+
   if (loading) {
     return <LoadingOverlay isLoading={true} message="Cargando productos..." />
   }
@@ -322,14 +345,10 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                     Registrarse
                   </Button>
                 </>
-              )}
-              
-              <Button variant="ghost" className="text-slate-300 hover:text-white relative">
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Carrito
-                <Badge className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs">3</Badge>
-              </Button>
-            </div>
+               )}
+               
+               <CartSummary onClick={() => setIsCartOpen(true)} />
+             </div>
 
             {/* Mobile Menu Button */}
             <Button variant="ghost" className="md:hidden text-slate-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -419,16 +438,13 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                     Registrarse
                   </Button>
                 </>
-              )}
-              
-              <Button variant="ghost" className="text-slate-300 hover:text-white justify-start">
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Carrito (3)
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+               )}
+               
+               <CartSummary onClick={() => setIsCartOpen(true)} isMobile={true} />
+             </div>
+           </div>
+         </div>
+       )}
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
@@ -809,29 +825,26 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                             )}
                           </div>
 
-                          <div className={`flex gap-2 mt-auto ${viewMode === "list" ? "mt-4" : ""}`}>
-                            <Button
-                              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                              disabled={product.stock === 0}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                // Aquí iría la lógica para agregar al carrito
-                              }}
-                            >
-                              <ShoppingCart className="w-4 h-4 mr-2" />
-                              {product.stock === 0 ? "Sin Stock" : "Agregar"}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                navigate(`/productos/${product.id}`)
-                              }}
-                            >
-                              Ver Detalle
-                            </Button>
-                          </div>
+                           <div className={`flex gap-2 mt-auto ${viewMode === "list" ? "mt-4" : ""}`}>
+                             <Button
+                               className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                               disabled={product.stock === 0}
+                               onClick={(e) => handleAddToCart(product, e)}
+                             >
+                               <ShoppingCart className="w-4 h-4 mr-2" />
+                               {product.stock === 0 ? "Sin Stock" : "Agregar"}
+                             </Button>
+                             <Button
+                               variant="outline"
+                               className="border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white"
+                               onClick={(e) => {
+                                 e.stopPropagation()
+                                 navigate(`/productos/${product.id}`)
+                               }}
+                             >
+                               Ver Detalle
+                             </Button>
+                           </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -880,11 +893,22 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
                 </Button>
               </div>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+           </div>
+         </div>
+       </div>
+
+       {/* Cart Sidebar */}
+       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+       {/* Stock Modal */}
+       <StockModal
+         isOpen={stockModal.isOpen}
+         onClose={() => setStockModal({ isOpen: false, message: '' })}
+         message={stockModal.message}
+         type="warning"
+       />
+     </div>
+   )
+ }
 
 export default ProductCatalog
