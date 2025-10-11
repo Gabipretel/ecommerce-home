@@ -17,6 +17,7 @@ import UserRegister from "./pages/UserRegister.jsx";
 import AdminRegister from "./pages/AdminRegister.jsx";
 import UserLogin from "./pages/UserLogin.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
+import Contact from "./pages/Contact.jsx";
 
 // Páginas del panel de administración
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -40,6 +41,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/categorias/:id" element={<CategoryDetail />} />
             <Route path="/productos/:id" element={<ProductDetail />} />
             <Route path="/carrito" element={<CartDetail />} />
+            <Route path="/contacto" element={<Contact />} />
             
             {/* Rutas de autenticación - protegidas para usuarios ya logueados */}
             <Route path="/register-user" element={<AuthProtectedRoute><UserRegister /></AuthProtectedRoute>} />

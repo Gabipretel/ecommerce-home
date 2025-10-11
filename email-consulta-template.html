@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gracias por tu consulta - Gamer Once, Gamer Always</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1);
+        color: #333;
+      }
+
+      .container {
+        max-width: 600px;
+        background: #fff;
+        margin: 50px auto;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        color: #9a4dcf;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #444;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .brand {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #9a4dcf;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>¡Gracias por tu consulta!</h2>
+      <p>
+        Hola <strong>${nombre}</strong>, gracias por comunicarte con nosotros.
+        Tu mensaje fue recibido correctamente y uno de nuestros representantes se pondrá en contacto contigo a la brevedad.
+      </p>
+
+      <p><strong>Detalle de tu consulta:</strong></p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Mensaje:</strong> ${mensaje}</p>
+
+      <hr />
+
+      <p>📅 Fecha de envío: ${fecha}</p>
+
+      <div class="footer">
+        <p>Gracias por confiar en nosotros 💜</p>
+        <div class="brand">Gamer Once, Gamer Always</div>
+      </div>
+    </div>
+  </body>
+</html>

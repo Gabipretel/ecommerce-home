@@ -22,7 +22,9 @@ import {
   Shield,
   Headphones,
   LogOut,
-  Settings
+  Settings,
+  Mail,
+  Phone
 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import { useCart } from "../context/CartContext"
@@ -202,6 +204,14 @@ export default function AppHome() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                className="text-slate-300 hover:text-white"
+                onClick={() => navigate('/contacto')}
+              >
+                Contacto
+              </Button>
+              
               {isAuthenticated ? (
                 <>
                   <div className="flex items-center space-x-2 text-slate-300">
@@ -262,6 +272,14 @@ export default function AppHome() {
             <div className="md:hidden py-4 border-t border-slate-700">
               <div className="space-y-4">
                 <div className="flex flex-col space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white justify-start"
+                    onClick={() => navigate('/contacto')}
+                  >
+                    Contacto
+                  </Button>
+                  
                   {isAuthenticated ? (
                     <>
                       <div className="flex items-center space-x-2 text-slate-300 px-3 py-2">
@@ -494,8 +512,29 @@ export default function AppHome() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Contact Section */}
       <section className="py-16 px-4 bg-slate-800/20">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold text-white mb-6">¿Tienes alguna consulta?</h2>
+            <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+              Nuestro equipo de expertos está aquí para ayudarte a encontrar el setup gaming perfecto. 
+              ¡No dudes en contactarnos!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
+                onClick={() => navigate('/contacto')}
+              >
+                Contáctanos
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-8 px-4 bg-slate-800/20">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
