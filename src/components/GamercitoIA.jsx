@@ -240,7 +240,9 @@ const GamercitoIA = () => {
           {/* Header */}
           <div
             ref={dragRef}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 rounded-t-xl cursor-grab active:cursor-grabbing flex items-center justify-between"
+            className={`bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-xl cursor-grab active:cursor-grabbing flex items-center justify-between ${
+              isMinimized ? "px-3 py-3 h-12" : "px-3 pt-3 pb-4"
+            }`}
             onMouseDown={handleMouseDown}
           >
             <div className="flex items-center space-x-2">
