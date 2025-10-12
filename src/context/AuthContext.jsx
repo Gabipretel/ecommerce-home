@@ -62,7 +62,8 @@ export const AuthProvider = ({ children }) => {
 
       await api.post('/email', emailData)
     } catch (error) {
-      console.LOG('Error al enviar email:', error)
+      console.log('Error al enviar email:', error)
+    }
   }
 
   // Login tradicional de usuario
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }) => {
       }
       return result
     } catch (error) {
-      console.error('Error en login:', error)
+      console.log('Error en login:', error)
       return { success: false, message: 'Error al iniciar sesión' }
     }
   }
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       }
       return result
     } catch (error) {
-      console.error('Error en login admin:', error)
+      console.log('Error en login admin:', error)
       return { success: false, message: 'Error al iniciar sesión' }
     }
   }
@@ -109,7 +110,7 @@ export const AuthProvider = ({ children }) => {
       }
       return result
     } catch (error) {
-      console.error('Error en registro:', error)
+      console.log('Error en registro:', error)
       return { success: false, message: 'Error al registrar usuario' }
     }
   }
@@ -150,7 +151,7 @@ export const AuthProvider = ({ children }) => {
       }
       return result
     } catch (error) {
-      console.error('Error en login con Google:', error)
+      console.log('Error en login con Google:', error)
       return { success: false, message: 'Error al iniciar sesión con Google' }
     }
   }

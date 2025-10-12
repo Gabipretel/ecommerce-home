@@ -33,6 +33,7 @@ import { formatPrice } from "../utils/priceFormatter"
 import CartSummary from "./CartSummary"
 import CartSidebar from "./CartSidebar"
 import StockModal from "./StockModal"
+import GamercitoIA from "./GamercitoIA"
 
 export default function AppHome() {
   const navigate = useNavigate()
@@ -658,6 +659,9 @@ export default function AppHome() {
         message={stockModal.message}
         type="warning"
       />
+
+      {/* Chat de IA */}
+      <GamercitoIA />
     </div>
   )
 }

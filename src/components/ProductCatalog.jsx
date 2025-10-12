@@ -36,6 +36,7 @@ import { useCart } from "../context/CartContext"
 import CartSummary from "./CartSummary"
 import CartSidebar from "./CartSidebar"
 import StockModal from "./StockModal"
+import GamercitoIA from "./GamercitoIA"
 
 const ProductCatalog = ({ categoryId, categoryName }) => {
   const navigate = useNavigate()
@@ -900,14 +901,17 @@ const ProductCatalog = ({ categoryId, categoryName }) => {
        {/* Cart Sidebar */}
        <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
-       {/* Stock Modal */}
-       <StockModal
-         isOpen={stockModal.isOpen}
-         onClose={() => setStockModal({ isOpen: false, message: '' })}
-         message={stockModal.message}
-         type="warning"
-       />
-     </div>
+      {/* Stock Modal */}
+      <StockModal
+        isOpen={stockModal.isOpen}
+        onClose={() => setStockModal({ isOpen: false, message: '' })}
+        message={stockModal.message}
+        type="warning"
+      />
+
+      {/* Chat de IA */}
+      <GamercitoIA />
+    </div>
    )
  }
 

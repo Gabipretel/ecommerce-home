@@ -27,6 +27,7 @@ import { formatPrice } from "../utils/priceFormatter"
 import { getImageUrlWithFallback } from "../utils/imageUtils"
 import CartSummary from "../components/CartSummary"
 import CartSidebar from "../components/CartSidebar"
+import GamercitoIA from "../components/GamercitoIA"
 
 const CartDetail = () => {
   const navigate = useNavigate()
@@ -441,6 +442,9 @@ const CartDetail = () => {
 
       {/* Cart Sidebar */}
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Chat de IA */}
+      <GamercitoIA />
     </div>
   )
 }

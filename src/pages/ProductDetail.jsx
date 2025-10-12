@@ -37,6 +37,7 @@ import { useCart } from "../context/CartContext"
 import CartSummary from "../components/CartSummary"
 import CartSidebar from "../components/CartSidebar"
 import StockModal from "../components/StockModal"
+import GamercitoIA from "../components/GamercitoIA"
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -653,6 +654,9 @@ const ProductDetail = () => {
         message={stockModal.message}
         type="warning"
       />
+
+      {/* Chat de IA */}
+      <GamercitoIA />
     </div>
   )
 };
