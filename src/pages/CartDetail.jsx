@@ -19,7 +19,9 @@ import {
   ArrowLeft,
   CreditCard,
   LogOut,
-  Settings
+  Settings,
+  Mail,
+  Send
 } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import { useCart } from "../context/CartContext"
@@ -29,12 +31,17 @@ import CartSummary from "../components/CartSummary"
 import CartSidebar from "../components/CartSidebar"
 import GamercitoIA from "../components/GamercitoIA"
 import CheckoutSuccessModal from "../components/CheckoutSuccessModal"
+import api from "../services/api"
+import { createPurchaseConfirmationTemplate } from "../templates/emailTemplates"
 
 const CartDetail = () => {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
+  const [emailCompra, setEmailCompra] = useState('')
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false)
+  const [orderMessage, setOrderMessage] = useState('')
   
   // Usar el contexto de autenticación
   const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
@@ -81,9 +88,51 @@ const CartDetail = () => {
     navigate('/admin')
   }
 
-  const handleCheckout = () => {
-    // Mostrar el modal de confirmación
-    setIsCheckoutModalOpen(true)
+  const handleCheckout = async () => {
+    if (!emailCompra.trim()) {
+      setOrderMessage('Por favor, ingresa tu email para recibir la confirmación de compra.')
+      setTimeout(() => setOrderMessage(''), 3000)
+      return
+    }
+
+    setIsSubmittingOrder(true)
+    
+    try {
+      // Crear el template de email usando la función externa
+      const emailTemplate = createPurchaseConfirmationTemplate({
+        emailCompra,
+        items,
+        totalItems,
+        totalPrice,
+        formatPrice,
+        getImageUrlWithFallback
+      })
+
+      const emailData = {
+        to: emailCompra,
+        subject: 'Confirmación de Reserva - Gamer Once, Gamer Always 🎮',
+        html: emailTemplate
+      }
+
+      const response = await api.post('/email', emailData)
+      
+      if (response.data.success) {
+        setOrderMessage('¡Reserva confirmada! Te hemos enviado los detalles por email. Contactanos por WhatsApp para finalizar la compra.')
+        // Mostrar el modal de confirmación
+        setIsCheckoutModalOpen(true)
+      } else {
+        setOrderMessage('Hubo un problema al procesar tu reserva. Intenta nuevamente.')
+      }
+      
+      // Limpiar mensaje después de 5 segundos
+      setTimeout(() => setOrderMessage(''), 5000)
+    } catch (error) {
+      console.error('Error al procesar la reserva:', error)
+      setOrderMessage('Error de conexión. Intenta nuevamente.')
+      setTimeout(() => setOrderMessage(''), 5000)
+    } finally {
+      setIsSubmittingOrder(false)
+    }
   }
 
   const handleCheckoutConfirm = () => {
@@ -430,12 +479,54 @@ const CartDetail = () => {
                     </div>
                   </div>
 
+                  {/* Campo de email para confirmación */}
+                  <div className="mb-6">
+                    <label htmlFor="emailCompra" className="block text-sm font-medium text-slate-300 mb-2">
+                      <Mail className="w-4 h-4 inline mr-2" />
+                      Email para confirmación de compra *
+                    </label>
+                    <input
+                      type="email"
+                      id="emailCompra"
+                      name="emailCompra"
+                      value={emailCompra}
+                      onChange={(e) => setEmailCompra(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      placeholder="tu@email.com"
+                    />
+                    <p className="text-xs text-slate-400 mt-1">
+                      Recibirás los detalles de tu reserva en este email
+                    </p>
+                  </div>
+
+                  {/* Mensaje de estado */}
+                  {orderMessage && (
+                    <div className={`mb-4 p-3 rounded-lg text-sm text-center ${
+                      orderMessage.includes('confirmada') || orderMessage.includes('enviado') 
+                        ? 'bg-green-500/20 border border-green-500/50 text-green-400' 
+                        : 'bg-red-500/20 border border-red-500/50 text-red-400'
+                    }`}>
+                      {orderMessage}
+                    </div>
+                  )}
+
                   <Button
                     onClick={handleCheckout}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 text-lg mb-4"
+                    disabled={isSubmittingOrder || !emailCompra.trim()}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 text-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Finalizar Compra
+                    {isSubmittingOrder ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Procesando Reserva...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 mr-2" />
+                        Confirmar Reserva
+                      </>
+                    )}
                   </Button>
 
                   <Button

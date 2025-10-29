@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import authService from '../services/authService'
 import { signInWithGoogle, logoutFirebase } from '../firebase/services'
 import api from '../services/api'
+import { createWelcomeEmailTemplate } from '../templates/emailTemplates'
 
 const AuthContext = createContext()
 
@@ -45,14 +46,11 @@ export const AuthProvider = ({ children }) => {
 
   const sendWelcomeEmail = async (userEmail, userName) => {
     try {
-      // Formatea el template HTML con los datos del usuario
-      const emailTemplate = `<!DOCTYPE html>\n<html lang=\"es\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>¡Bienvenido a Gamer Once, Gamer Always!</title>\n    <style>\n      body {\n        font-family: 'Segoe UI', Roboto, Arial, sans-serif;\n        margin: 0;\n        padding: 0;\n        background: linear-gradient(135deg, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1);\n        color: #333;\n      }\n\n      .container {\n        max-width: 600px;\n        background: #fff;\n        margin: 50px auto;\n        padding: 30px 40px;\n        border-radius: 12px;\n        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n      }\n\n      h2 {\n        color: #9a4dcf;\n        margin-bottom: 10px;\n      }\n\n      p {\n        font-size: 16px;\n        line-height: 1.6;\n        color: #444;\n      }\n\n      .highlight {\n        color: #9a4dcf;\n        font-weight: bold;\n      }\n\n      .footer {\n        text-align: center;\n        margin-top: 30px;\n        font-size: 14px;\n        color: #666;\n      }\n\n      .brand {\n        text-align: center;\n        margin-top: 20px;\n        font-size: 18px;\n        font-weight: bold;\n        color: #9a4dcf;\n      }\n\n      hr {\n        border: none;\n        border-top: 1px solid #ddd;\n        margin: 20px 0;\n      }\n\n      .button {\n        display: inline-block;\n        padding: 12px 24px;\n        background: linear-gradient(90deg, #ba83ca, #9a9ae1);\n        color: white;\n        text-decoration: none;\n        border-radius: 8px;\n        font-weight: bold;\n        margin-top: 15px;\n        transition: opacity 0.3s ease;\n      }\n\n      .button:hover {\n        opacity: 0.9;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"container\">\n      <h2>¡Bienvenido a la comunidad Gamer!</h2>\n      <p>\n        Hola <strong>${userName}</strong>, gracias por registrarte en \n        <span class=\"highlight\">Gamer Once, Gamer Always</span>. 🎮  \n        Ya sos parte de una comunidad que vive y disfruta del gaming como vos.\n      </p>\n\n      <p>\n        Desde ahora vas a poder acceder a ofertas exclusivas, lanzamientos y novedades de productos gamer.\n      </p>\n\n      <p>\n        Te damos la bienvenida con todo nuestro entusiasmo 💜  \n        ¡Estamos felices de tenerte con nosotros!\n      </p>\n\n      <hr />\n\n      <p>📅 Fecha de registro: ${new Date().toLocaleDateString('es-ES', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })}</p>\n\n      <div style=\"text-align: center;\">\n        <a href=\"http://localhost:5173/\" class=\"button\">Visitar Tienda</a>\n      </div>\n\n      <div class=\"footer\">\n        <p>Gracias por elegirnos 💜</p>\n        <div class=\"brand\">Gamer Once, Gamer Always</div>\n      </div>\n    </div>\n  </body>\n</html>`
+      // Crear el template de email usando la función externa
+      const emailTemplate = createWelcomeEmailTemplate({
+        userName,
+        userEmail
+      })
 
       const emailData = {
         to: userEmail,

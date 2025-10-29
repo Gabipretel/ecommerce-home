@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import api from "../services/api"
+import { createContactConfirmationTemplate } from "../templates/emailTemplates"
 import {
   Gamepad2,
   Zap,
@@ -39,14 +40,12 @@ export default function Contact() {
     setIsSubmitting(true)
     
     try {
-      // Formatear el template HTML con los datos del formulario
-      const emailTemplate = `<!DOCTYPE html>\n<html lang=\"es\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <title>Gracias por tu consulta - Gamer Once, Gamer Always</title>\n    <style>\n      body {\n        font-family: 'Segoe UI', Roboto, Arial, sans-serif;\n        margin: 0;\n        padding: 0;\n        background: linear-gradient(135deg, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1);\n        color: #333;\n      }\n\n      .container {\n        max-width: 600px;\n        background: #fff;\n        margin: 50px auto;\n        padding: 30px 40px;\n        border-radius: 12px;\n        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);\n      }\n\n      h2 {\n        color: #9a4dcf;\n        margin-bottom: 10px;\n      }\n\n      p {\n        font-size: 16px;\n        line-height: 1.6;\n        color: #444;\n      }\n\n      .footer {\n        text-align: center;\n        margin-top: 30px;\n        font-size: 14px;\n        color: #666;\n      }\n\n      .brand {\n        text-align: center;\n        margin-top: 20px;\n        font-size: 18px;\n        font-weight: bold;\n        color: #9a4dcf;\n      }\n\n      hr {\n        border: none;\n        border-top: 1px solid #ddd;\n        margin: 20px 0;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div class=\"container\">\n      <h2>¡Gracias por tu consulta!</h2>\n      <p>\n        Hola <strong>${formData.nombre}</strong>, gracias por comunicarte con nosotros.\n        Tu mensaje fue recibido correctamente y uno de nuestros representantes se pondrá en contacto contigo a la brevedad.\n      </p>\n\n      <p><strong>Detalle de tu consulta:</strong></p>\n      <p><strong>Email:</strong> ${formData.email}</p>\n      <p><strong>Mensaje:</strong> ${formData.consulta}</p>\n\n      <hr />\n\n      <p>📅 Fecha de envío: ${new Date().toLocaleDateString('es-ES', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })}</p>\n\n      <div class=\"footer\">\n        <p>Gracias por confiar en nosotros 💜</p>\n        <div class=\"brand\">Gamer Once, Gamer Always</div>\n      </div>\n    </div>\n  </body>\n</html>`
+      // Crear el template de email usando la función externa
+      const emailTemplate = createContactConfirmationTemplate({
+        nombre: formData.nombre,
+        email: formData.email,
+        consulta: formData.consulta
+      })
 
       const emailData = {
         to: formData.email,
