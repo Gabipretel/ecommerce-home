@@ -28,11 +28,13 @@ import { getImageUrlWithFallback } from "../utils/imageUtils"
 import CartSummary from "../components/CartSummary"
 import CartSidebar from "../components/CartSidebar"
 import GamercitoIA from "../components/GamercitoIA"
+import CheckoutSuccessModal from "../components/CheckoutSuccessModal"
 
 const CartDetail = () => {
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
   
   // Usar el contexto de autenticación
   const { isAuthenticated, userType, user: currentUser, logout } = useAuth()
@@ -80,7 +82,17 @@ const CartDetail = () => {
   }
 
   const handleCheckout = () => {
-    alert('Funcionalidad de checkout en desarrollo')
+    // Mostrar el modal de confirmación
+    setIsCheckoutModalOpen(true)
+  }
+
+  const handleCheckoutConfirm = () => {
+    // Limpiar el carrito
+    clearCart()
+    // Cerrar el modal
+    setIsCheckoutModalOpen(false)
+    // Opcional: redirigir al inicio
+    navigate('/')
   }
 
   // Si es admin, redirigir o mostrar mensaje
@@ -346,22 +358,22 @@ const CartDetail = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                className="w-8 h-8 p-0 border-slate-600"
+                                className="w-8 h-8 p-0 border-slate-500 bg-slate-800/50 hover:bg-slate-700/70 hover:border-slate-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={item.quantity <= 1}
                               >
-                                <Minus className="w-3 h-3" />
+                                <Minus className="w-3 h-3 text-white" />
                               </Button>
-                              <span className="text-white font-medium w-12 text-center text-lg">
+                              <span className="px-3 py-1 text-white font-semibold bg-slate-800/30 border border-slate-600 rounded min-w-[2rem] text-center">
                                 {item.quantity}
                               </span>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                className="w-8 h-8 p-0 border-slate-600"
+                                className="w-8 h-8 p-0 border-slate-500 bg-slate-800/50 hover:bg-slate-700/70 hover:border-slate-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={item.quantity >= item.stock}
                               >
-                                <Plus className="w-3 h-3" />
+                                <Plus className="w-3 h-3 text-white" />
                               </Button>
                             </div>
                           </div>
@@ -445,6 +457,12 @@ const CartDetail = () => {
 
       {/* Chat de IA */}
       <GamercitoIA />
+
+      {/* Modal de confirmación de compra */}
+      <CheckoutSuccessModal 
+        isOpen={isCheckoutModalOpen} 
+        onClose={handleCheckoutConfirm} 
+      />
     </div>
   )
 }

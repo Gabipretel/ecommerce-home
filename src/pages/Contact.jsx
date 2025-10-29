@@ -12,7 +12,8 @@ import {
   Send,
   User,
   MessageSquare,
-  ArrowLeft
+  ArrowLeft,
+  Smartphone
 } from "lucide-react"
 
 export default function Contact() {
@@ -232,7 +233,16 @@ export default function Contact() {
                         <p className="text-slate-400 text-sm">Lun-Vie 9AM-6PM</p>
                       </div>
                     </div>
-
+                    <div className="flex items-start space-x-4">
+                      <button onClick={() => window.open('https://wa.me/573178520111')} className="w-12 h-12 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Smartphone className="w-6 h-6 text-white" />
+                      </button>
+                      <div onClick={() => window.open('https://wa.me/573178520111')}>
+                        <h3 className="text-white font-semibold mb-1">WhatsApp</h3>
+                        <p className="text-slate-300">+1 (555) 123-4567</p>
+                        <p className="text-slate-400 text-sm">Lun-Vie 9AM-6PM</p>
+                      </div>
+                    </div>
                     <div className="flex items-start space-x-4">
                       <div className="w-12 h-12 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
                         <MapPin className="w-6 h-6 text-white" />

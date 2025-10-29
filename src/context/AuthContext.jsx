@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      })}</p>\n\n      <div style=\"text-align: center;\">\n        <a href=\"https://gameronce.com\" class=\"button\">Visitar Tienda</a>\n      </div>\n\n      <div class=\"footer\">\n        <p>Gracias por elegirnos 💜</p>\n        <div class=\"brand\">Gamer Once, Gamer Always</div>\n      </div>\n    </div>\n  </body>\n</html>`
+      })}</p>\n\n      <div style=\"text-align: center;\">\n        <a href=\"http://localhost:5173/\" class=\"button\">Visitar Tienda</a>\n      </div>\n\n      <div class=\"footer\">\n        <p>Gracias por elegirnos 💜</p>\n        <div class=\"brand\">Gamer Once, Gamer Always</div>\n      </div>\n    </div>\n  </body>\n</html>`
 
       const emailData = {
         to: userEmail,

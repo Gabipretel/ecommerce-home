@@ -638,7 +638,8 @@ export default function AppHome() {
               <h3 className="text-white font-semibold mb-4">Contacto</h3>
               <ul className="space-y-2 text-slate-300 text-sm">
                 <li>Email: info@gg-store.com</li>
-                <li>Teléfono: +1 (555) 123-4567</li>
+                <li >Teléfono: +1 (555) 123-4567</li>
+                <li onClick={() => window.open('https://wa.me/573178520111')}>WhatsApp: +1 (555) 123-4567</li>
                 <li>Horario: Lun-Vie 9AM-6PM</li>
               </ul>
             </div>

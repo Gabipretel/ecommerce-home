@@ -140,22 +140,22 @@ const CartSidebar = ({ isOpen, onClose }) => {
                               variant="outline"
                               size="sm"
                               onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.stock)}
-                              className="w-8 h-8 p-0 border-slate-600"
+                              className="w-8 h-8 p-0 border-slate-500 bg-slate-800/50 hover:bg-slate-700/70 hover:border-slate-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                               disabled={item.quantity <= 1}
                             >
-                              <Minus className="w-3 h-3" />
+                              <Minus className="w-3 h-3 text-white" />
                             </Button>
-                            <span className="text-white font-medium w-8 text-center">
+                            <span className="px-3 py-1 text-white font-semibold bg-slate-800/30 border border-slate-600 rounded min-w-[2rem] text-center">
                               {item.quantity}
                             </span>
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.stock)}
-                              className="w-8 h-8 p-0 border-slate-600"
+                              className="w-8 h-8 p-0 border-slate-500 bg-slate-800/50 hover:bg-slate-700/70 hover:border-slate-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                               disabled={item.quantity >= item.stock}
                             >
-                              <Plus className="w-3 h-3" />
+                              <Plus className="w-3 h-3 text-white" />
                             </Button>
                           </div>
 

@@ -539,25 +539,27 @@ const ProductDetail = () => {
               {/* Selector de cantidad */}
               <div className="flex items-center space-x-4">
                 <span className="text-white font-semibold">Cantidad:</span>
-                <div className="flex items-center border border-slate-600 rounded-lg">
+                <div className="flex items-center space-x-2">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={quantity <= 1}
-                    className="text-slate-300 hover:text-white"
+                    className="w-8 h-8 p-0 border-slate-500 bg-slate-800/50 hover:bg-slate-700/70 hover:border-slate-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-3 h-3 text-white" />
                   </Button>
-                  <span className="px-4 py-2 text-white font-semibold">{quantity}</span>
+                  <span className="px-3 py-1 text-white font-semibold bg-slate-800/30 border border-slate-600 rounded min-w-[2rem] text-center">
+                    {quantity}
+                  </span>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => setQuantity(Math.min(producto.stock || 10, quantity + 1))}
                     disabled={quantity >= (producto.stock || 10)}
-                    className="text-slate-300 hover:text-white"
+                    className="w-8 h-8 p-0 border-slate-500 bg-slate-800/50 hover:bg-slate-700/70 hover:border-slate-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3 h-3 text-white" />
                   </Button>
                 </div>
                 <span className="text-slate-400 text-sm">({producto.stock || 0} disponibles)</span>
