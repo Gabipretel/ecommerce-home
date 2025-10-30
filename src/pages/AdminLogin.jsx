@@ -166,7 +166,7 @@ const AdminLogin = () => {
               </button>
 
               <div className="text-center space-y-2">
-                <p className="text-slate-400 text-sm">
+                {/* <p className="text-slate-400 text-sm">
                   ¿Necesitas crear un administrador?{' '}
                   <button
                     type="button"
@@ -175,7 +175,7 @@ const AdminLogin = () => {
                   >
                     Regístrate aquí
                   </button>
-                </p>
+                </p> */}
                 <p className="text-slate-400 text-sm">
                   ¿Eres usuario?{' '}
                   <button

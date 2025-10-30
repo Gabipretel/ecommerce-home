@@ -45,7 +45,7 @@ createRoot(document.getElementById("root")).render(
             
             {/* Rutas de autenticación - protegidas para usuarios ya logueados */}
             <Route path="/register-user" element={<AuthProtectedRoute><UserRegister /></AuthProtectedRoute>} />
-            <Route path="/register-admin" element={<AuthProtectedRoute><AdminRegister /></AuthProtectedRoute>} />
+            {/* <Route path="/register-admin" element={<AuthProtectedRoute><AdminRegister /></AuthProtectedRoute>} /> */}
             <Route path="/login-user" element={<AuthProtectedRoute><UserLogin /></AuthProtectedRoute>} />
             <Route path="/login-admin" element={<AuthProtectedRoute><AdminLogin /></AuthProtectedRoute>} />
             
